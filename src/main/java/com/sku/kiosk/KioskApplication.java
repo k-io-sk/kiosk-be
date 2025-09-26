@@ -1,3 +1,6 @@
+/* 
+ * Copyright (c) SKU K-IO-SK 
+ */
 package com.sku.kiosk;
 
 import org.springframework.boot.SpringApplication;
@@ -11,5 +14,4 @@ public class KioskApplication {
   public static void main(String[] args) {
     SpringApplication.run(KioskApplication.class, args);
   }
-
 }

@@ -1,3 +1,6 @@
+/* 
+ * Copyright (c) SKU K-IO-SK 
+ */
 package com.sku.kiosk;
 
 import org.junit.jupiter.api.Test;
@@ -7,7 +10,5 @@ import org.springframework.boot.test.context.SpringBootTest;
 class KioskApplicationTests {
 
   @Test
-  void contextLoads() {
-  }
-
+  void contextLoads() {}
 }
