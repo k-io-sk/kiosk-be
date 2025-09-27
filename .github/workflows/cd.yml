@@ -56,7 +56,7 @@ jobs:
           username: ${{ github.ref == 'refs/heads/main' && secrets.SSH_USERNAME_PROD }}
           key: ${{ github.ref == 'refs/heads/main' && secrets.SSH_PRIVATE_KEY_PROD }}
           script: |
-            cd /home/ubuntu/actions-runner/_work/BE/BE/docker
+            cd /home/ubuntu/actions-runner/_work/kiosk-be/kiosk-be/docker
             echo "$ENV_PROD" > ./.env
             echo "PROFILE=prod" >> ./.env
             docker compose -f docker-compose.yml --env-file ./.env down
