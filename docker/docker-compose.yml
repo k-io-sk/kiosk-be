@@ -1,0 +1,57 @@
+services:
+  app:
+    image: ksieon/kiosk:latest
+    container_name: kiosk-app-prod
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: ${PROFILE:-prod}
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${DB_NAME}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASS}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - kiosk-network
+    restart: unless-stopped
+
+  mysql:
+    image: mysql:8.0
+    expose:
+      - "3306"
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASS}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASS}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - kiosk-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  dozzle:
+    image: amir20/dozzle:latest
+    ports:
+      - "9999:8080"
+    environment:
+      - TZ=Asia/Seoul
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - kiosk-network
+    restart: unless-stopped
+
+networks:
+  kiosk-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
