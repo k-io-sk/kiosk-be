@@ -7,6 +7,8 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
 
+import com.sku.kiosk.global.common.BaseTimeEntity;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,7 +22,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Event {
+public class Event extends BaseTimeEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -42,12 +44,12 @@ public class Event {
   private EventCategory category;
 
   @Column(name = "recruit_target")
-  private String recruit_tartget;
+  private String recruitTarget;
 
   private String price;
 
-  private String Inquiry; // 문의
+  private String inquiry; // 문의
 
   @Column(name = "main_image")
-  private String main_image;
+  private String mainImage;
 }
