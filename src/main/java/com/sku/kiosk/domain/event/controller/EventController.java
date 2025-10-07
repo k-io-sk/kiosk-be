@@ -3,7 +3,6 @@
  */
 package com.sku.kiosk.domain.event.controller;
 
-import com.sku.kiosk.domain.event.entity.Event;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sku.kiosk.domain.event.Dto.EventResponse;
+import com.sku.kiosk.domain.event.entity.Event;
 import com.sku.kiosk.domain.event.entity.EventCategory;
 import com.sku.kiosk.domain.event.service.EventService;
 

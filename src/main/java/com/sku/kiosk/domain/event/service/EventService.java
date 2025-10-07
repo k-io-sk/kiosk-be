@@ -21,7 +21,7 @@ public class EventService {
 
   private final EventRepository eventRepository;
 
-  //-------------------------조회-----------------------------
+  // -------------------------조회-----------------------------
   // 전체보기
   public List<EventResponse> getAllEvents() {
     List<Event> eventList = eventRepository.findAll();
@@ -64,7 +64,7 @@ public class EventService {
     return toDetailResponse(event);
   }
 
-  //---------------------------CRUD---------------------------------
+  // ---------------------------CRUD---------------------------------
 
   public EventResponse createEvent(Event event) {
     Event saved = eventRepository.save(event);
@@ -72,8 +72,10 @@ public class EventService {
   }
 
   public EventResponse updateEvent(Long id, Event updatedEvent) {
-    Event event = eventRepository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("이벤트를 찾을 수 없습니다."));
+    Event event =
+        eventRepository
+            .findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("이벤트를 찾을 수 없습니다."));
 
     event.setTitle(updatedEvent.getTitle());
     event.setLocation(updatedEvent.getLocation());
@@ -99,8 +101,7 @@ public class EventService {
     eventRepository.deleteById(id);
   }
 
-
-  //------------------------DTO Response------------------------------
+  // ------------------------DTO Response------------------------------
   // List 패이지 반환값
   private EventResponse toListResponse(Event event) {
     EventResponse response =
