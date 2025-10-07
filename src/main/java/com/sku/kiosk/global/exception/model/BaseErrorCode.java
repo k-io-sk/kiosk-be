@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) LikeLion13th Problem not Found 
+ * Copyright (c) SKU K-IO-SK 
  */
 package com.sku.kiosk.global.exception.model;
 

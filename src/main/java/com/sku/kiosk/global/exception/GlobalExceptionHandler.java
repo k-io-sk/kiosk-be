@@ -1,11 +1,10 @@
 /* 
- * Copyright (c) LikeLion13th Problem not Found 
+ * Copyright (c) SKU K-IO-SK 
  */
 package com.sku.kiosk.global.exception;
 
-import com.likelion13.artium.global.exception.model.BaseErrorCode;
-import com.likelion13.artium.global.response.BaseResponse;
-import lombok.extern.slf4j.Slf4j;
+import java.util.stream.Collectors;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -13,7 +12,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import java.util.stream.Collectors;
+import com.sku.kiosk.global.exception.model.BaseErrorCode;
+import com.sku.kiosk.global.response.BaseResponse;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 전역 예외 처리 클래스입니다.

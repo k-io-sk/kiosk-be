@@ -1,12 +1,14 @@
 /* 
- * Copyright (c) LikeLion13th Problem not Found 
+ * Copyright (c) SKU K-IO-SK 
  */
 package com.sku.kiosk.global.page.exception;
 
-import com.likelion13.artium.global.exception.model.BaseErrorCode;
+import org.springframework.http.HttpStatus;
+
+import com.sku.kiosk.global.exception.model.BaseErrorCode;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.springframework.http.HttpStatus;
 
 @Getter
 @AllArgsConstructor

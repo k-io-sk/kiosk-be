@@ -1,9 +1,10 @@
 /* 
- * Copyright (c) LikeLion13th Problem not Found 
+ * Copyright (c) SKU K-IO-SK 
  */
 package com.sku.kiosk.global.exception;
 
-import com.likelion13.artium.global.exception.model.BaseErrorCode;
+import com.sku.kiosk.global.exception.model.BaseErrorCode;
+
 import lombok.Getter;
 
 @Getter

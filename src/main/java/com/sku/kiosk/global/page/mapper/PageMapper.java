@@ -1,17 +1,12 @@
 /* 
- * Copyright (c) LikeLion13th Problem not Found 
+ * Copyright (c) SKU K-IO-SK 
  */
 package com.sku.kiosk.global.page.mapper;
 
-import com.likelion13.artium.domain.exhibition.dto.response.ExhibitionResponse;
-import com.likelion13.artium.domain.piece.dto.response.PieceFeedResponse;
-import com.likelion13.artium.domain.piece.dto.response.PieceSummaryResponse;
-import com.likelion13.artium.domain.review.dto.response.ReviewResponse;
-import com.likelion13.artium.domain.user.dto.response.CreatorFeedResponse;
-import com.likelion13.artium.domain.user.dto.response.UserSummaryResponse;
-import com.likelion13.artium.global.page.response.PageResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
+
+import com.sku.kiosk.global.page.response.PageResponse;
 
 @Component
 public class PageMapper {
@@ -26,31 +21,5 @@ public class PageMapper {
         .last(page.isLast())
         .first(page.isFirst())
         .build();
-  }
-
-  public PageResponse<ExhibitionResponse> toExhibitionPageResponse(Page<ExhibitionResponse> page) {
-    return toPageResponse(page);
-  }
-
-  public PageResponse<PieceSummaryResponse> toPiecePageResponse(Page<PieceSummaryResponse> page) {
-    return toPageResponse(page);
-  }
-
-  public PageResponse<PieceFeedResponse> toPieceFeedPageResponse(Page<PieceFeedResponse> page) {
-    return toPageResponse(page);
-  }
-
-  public PageResponse<ReviewResponse> toReviewPageResponse(Page<ReviewResponse> page) {
-    return toPageResponse(page);
-  }
-
-  public PageResponse<UserSummaryResponse> toUserSummaryPageResponse(
-      Page<UserSummaryResponse> page) {
-    return toPageResponse(page);
-  }
-
-  public PageResponse<CreatorFeedResponse> toCreatorFeedPageResponse(
-      Page<CreatorFeedResponse> page) {
-    return toPageResponse(page);
   }
 }
