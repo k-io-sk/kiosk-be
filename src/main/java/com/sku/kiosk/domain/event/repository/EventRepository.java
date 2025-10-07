@@ -14,7 +14,7 @@ import com.sku.kiosk.domain.event.entity.EventCategory;
 @Repository
 public interface EventRepository extends JpaRepository<Event, Long> {
   // 카테고리별
-  List<Event> findByCategory(EventCategory category);
+  List<Event> findByEventCategory(EventCategory eventCategory);
 
   // 제목으로 검색 (부분 일치)
   List<Event> findByTitleContainingIgnoreCase(String title);

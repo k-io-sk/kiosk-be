@@ -30,10 +30,10 @@ public class Event extends BaseTimeEntity {
   @Column(name = "cult_code", nullable = false)
   private Long cultCode;
 
-  @Column(nullable = false)
+  @Column(name = "title", nullable = false)
   private String title;
 
-  @Column(nullable = false)
+  @Column(name = "location", nullable = false)
   private String location;
 
   @Column(name = "start_date")
@@ -43,27 +43,35 @@ public class Event extends BaseTimeEntity {
   private LocalDateTime endDate;
 
   @Column(name = "event_time")
-  private LocalDateTime eventTime;
+  private String eventTime;
 
   @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
-  private EventCategory category;
+  @Column(name = "event_category", nullable = false)
+  private EventCategory eventCategory;
 
   @Column(name = "recruit_target")
   private String recruitTarget;
 
+  @Column(name = "price")
   private String price;
 
+  @Column(name = "inquiry")
   private String inquiry; // 문의
 
   @Column(name = "main_image")
   private String mainImage;
 
+  @Column(name = "address")
   private String address;
 
+  @Column(name = "latitude")
   private Double latitude;
+
+  @Column(name = "longitude")
   private Double longitude;
 
   @Enumerated(EnumType.STRING)
-  private Status status;
+  @Column(name = "status")
+  @Builder.Default
+  private Status status = Status.ONGOING;
 }

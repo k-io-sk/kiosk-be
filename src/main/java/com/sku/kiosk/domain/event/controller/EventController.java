@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sku.kiosk.domain.event.Dto.EventResponse;
+import com.sku.kiosk.domain.event.dto.response.EventResponse;
 import com.sku.kiosk.domain.event.entity.Event;
 import com.sku.kiosk.domain.event.entity.EventCategory;
 import com.sku.kiosk.domain.event.service.EventService;
@@ -34,8 +34,8 @@ public class EventController {
   }
 
   @GetMapping("/category/{category}")
-  public List<EventResponse> getEventsByCategory(@PathVariable EventCategory category) {
-    return eventService.getEventsByCategory(category);
+  public List<EventResponse> getEventsByEventCategory(@PathVariable EventCategory category) {
+    return eventService.getEventsByEventCategory(category);
   }
 
   // 상세보기

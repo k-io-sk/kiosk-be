@@ -8,7 +8,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.sku.kiosk.domain.event.Dto.EventResponse;
+import com.sku.kiosk.domain.event.dto.response.EventResponse;
 import com.sku.kiosk.domain.event.entity.Event;
 import com.sku.kiosk.domain.event.entity.EventCategory;
 import com.sku.kiosk.domain.event.repository.EventRepository;
@@ -34,8 +34,8 @@ public class EventService {
   }
 
   // 카테고리별 조회
-  public List<EventResponse> getEventsByCategory(EventCategory category) {
-    List<Event> eventList = eventRepository.findByCategory(category);
+  public List<EventResponse> getEventsByEventCategory(EventCategory category) {
+    List<Event> eventList = eventRepository.findByEventCategory(category);
     List<EventResponse> result = new ArrayList<>();
 
     for (Event e : eventList) {
@@ -79,7 +79,7 @@ public class EventService {
 
     event.setTitle(updatedEvent.getTitle());
     event.setLocation(updatedEvent.getLocation());
-    event.setCategory(updatedEvent.getCategory());
+    event.setEventCategory(updatedEvent.getEventCategory());
     event.setStartDate(updatedEvent.getStartDate());
     event.setEndDate(updatedEvent.getEndDate());
     event.setPrice(updatedEvent.getPrice());
@@ -112,7 +112,7 @@ public class EventService {
             .location(event.getLocation())
             .startDate(event.getStartDate())
             .endDate(event.getEndDate())
-            .category(event.getCategory())
+            .eventCategory(event.getEventCategory())
             .mainImage(event.getMainImage())
             .status(event.getStatus())
             .build();
@@ -129,7 +129,7 @@ public class EventService {
             .location(event.getLocation())
             .startDate(event.getStartDate())
             .endDate(event.getEndDate())
-            .category(event.getCategory())
+            .eventCategory(event.getEventCategory())
             .mainImage(event.getMainImage())
             .price(event.getPrice())
             .address(event.getAddress())

@@ -1,7 +1,7 @@
 /* 
  * Copyright (c) SKU K-IO-SK 
  */
-package com.sku.kiosk.domain.event.Dto;
+package com.sku.kiosk.domain.event.dto.response;
 
 import java.time.LocalDateTime;
 
@@ -21,7 +21,7 @@ public class EventResponse {
   private LocalDateTime endDate;
   private LocalDateTime eventTime;
 
-  private EventCategory category;
+  private EventCategory eventCategory;
 
   private String recruitTarget;
   private String price;
