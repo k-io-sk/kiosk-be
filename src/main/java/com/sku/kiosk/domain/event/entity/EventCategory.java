@@ -4,8 +4,9 @@
 package com.sku.kiosk.domain.event.entity;
 
 public enum EventCategory {
-  PERFORMANCE, // 공연
-  DISPLAY, // 전시
+  SHOW, // 공연
+  EXHIBITION, // 전시
   FESTIVAL, // 축제
-  EXPERIENCE // 체험
+  EDUEXP, // 교육/체험
+  ECT // 기타
 }

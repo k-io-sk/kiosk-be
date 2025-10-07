@@ -27,6 +27,9 @@ public class Event extends BaseTimeEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @Column(name = "cult_code", nullable = false)
+  private Long cultCode;
+
   @Column(nullable = false)
   private String title;
 
@@ -38,6 +41,9 @@ public class Event extends BaseTimeEntity {
 
   @Column(name = "end_date")
   private LocalDateTime endDate;
+
+  @Column(name = "event_time")
+  private LocalDateTime eventTime;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
@@ -52,4 +58,12 @@ public class Event extends BaseTimeEntity {
 
   @Column(name = "main_image")
   private String mainImage;
+
+  private String address;
+
+  private Double latitude;
+  private Double longitude;
+
+  @Enumerated(EnumType.STRING)
+  private Status status;
 }
