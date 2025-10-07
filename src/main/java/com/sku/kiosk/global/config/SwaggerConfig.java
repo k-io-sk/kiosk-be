@@ -42,8 +42,8 @@ public class SwaggerConfig {
                     - 파일 업로드 크기 제한: 5MB (1개 파일 크기)
 
                     ## 문의
-                    - 기술 문의: unijun0109@gmail.com, keumsiun@skuniv.ac.kr
-                    - 일반 문의: unijun0109@gmail.com, keumsiun@skuniv.ac.kr
+                    - 기술 문의: unijun0109@gmail.com, keumsiun@skuniv.ac.kr,
+                    - 일반 문의: unijun0109@gmail.com, keumsiun@skuniv.ac.kr,
                     """));
   }
 

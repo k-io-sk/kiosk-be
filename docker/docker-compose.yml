@@ -25,6 +25,7 @@ services:
       MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PASS}
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASS}
+      TZ: Asia/Seoul
     volumes:
       - mysql-data:/var/lib/mysql
     networks:
