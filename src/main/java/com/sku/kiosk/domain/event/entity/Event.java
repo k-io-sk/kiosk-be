@@ -3,7 +3,7 @@
  */
 package com.sku.kiosk.domain.event.entity;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import jakarta.persistence.*;
 
@@ -37,10 +37,10 @@ public class Event extends BaseTimeEntity {
   private String location;
 
   @Column(name = "start_date")
-  private LocalDateTime startDate;
+  private LocalDate startDate;
 
   @Column(name = "end_date")
-  private LocalDateTime endDate;
+  private LocalDate endDate;
 
   @Column(name = "event_time")
   private String eventTime;

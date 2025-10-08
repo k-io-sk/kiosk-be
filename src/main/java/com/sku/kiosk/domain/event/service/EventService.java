@@ -7,8 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.sku.kiosk.domain.event.dto.request.CreateEventRequest;
+import com.sku.kiosk.domain.event.dto.request.UpdateEventRequest;
 import com.sku.kiosk.domain.event.dto.response.EventResponse;
+import com.sku.kiosk.domain.event.dto.response.ListEventResponse;
 import com.sku.kiosk.domain.event.entity.Event;
 import com.sku.kiosk.domain.event.entity.EventCategory;
 import com.sku.kiosk.domain.event.repository.EventRepository;
@@ -23,39 +27,43 @@ public class EventService {
 
   // -------------------------조회-----------------------------
   // 전체보기
-  public List<EventResponse> getAllEvents() {
+  @Transactional
+  public List<ListEventResponse> getAllEvents() {
     List<Event> eventList = eventRepository.findAll();
-    List<EventResponse> result = new ArrayList<>();
 
+    List<ListEventResponse> result = new ArrayList<>();
     for (Event e : eventList) {
-      result.add(toListResponse(e));
+      result.add(toListEventResponse(e));
     }
     return result;
   }
 
   // 카테고리별 조회
-  public List<EventResponse> getEventsByEventCategory(EventCategory category) {
-    List<Event> eventList = eventRepository.findByEventCategory(category);
-    List<EventResponse> result = new ArrayList<>();
+  @Transactional
+  public List<ListEventResponse> getEventsByEventCategory(EventCategory eventCategory) {
+    List<Event> eventList = eventRepository.findByEventCategory(eventCategory);
+    List<ListEventResponse> result = new ArrayList<>();
 
     for (Event e : eventList) {
-      result.add(toListResponse(e));
+      result.add(toListEventResponse(e));
     }
     return result;
   }
 
   // title로 검색
+  @Transactional
   public List<EventResponse> searchEvents(String title) {
     List<Event> eventList = eventRepository.findByTitleContainingIgnoreCase(title);
     List<EventResponse> result = new ArrayList<>();
 
     for (Event e : eventList) {
-      result.add(toListResponse(e));
+      // result.add(toListEventResponse(e));
     }
     return result;
   }
 
   // detail 페이지 조회
+  @Transactional
   public EventResponse getEventDetail(Long id) {
     Event event =
         eventRepository
@@ -66,32 +74,25 @@ public class EventService {
 
   // ---------------------------CRUD---------------------------------
 
-  public EventResponse createEvent(Event event) {
-    Event saved = eventRepository.save(event);
-    return toDetailResponse(saved);
+  @Transactional
+  public EventResponse createEvent(
+      CreateEventRequest createEventRequest, EventCategory eventCategory) {
+    Event event = toCreateEvent(createEventRequest, eventCategory);
+    eventRepository.save(event);
+    return toDetailResponse(event);
   }
 
-  public EventResponse updateEvent(Long id, Event updatedEvent) {
+  @Transactional
+  public EventResponse updateEvent(
+      Long id, UpdateEventRequest updateEventRequest, EventCategory eventCategory) {
     Event event =
         eventRepository
             .findById(id)
             .orElseThrow(() -> new IllegalArgumentException("이벤트를 찾을 수 없습니다."));
 
-    event.setTitle(updatedEvent.getTitle());
-    event.setLocation(updatedEvent.getLocation());
-    event.setEventCategory(updatedEvent.getEventCategory());
-    event.setStartDate(updatedEvent.getStartDate());
-    event.setEndDate(updatedEvent.getEndDate());
-    event.setPrice(updatedEvent.getPrice());
-    event.setInquiry(updatedEvent.getInquiry());
-    event.setAddress(updatedEvent.getAddress());
-    event.setLatitude(updatedEvent.getLatitude());
-    event.setLongitude(updatedEvent.getLongitude());
-    event.setStatus(updatedEvent.getStatus());
-    event.setMainImage(updatedEvent.getMainImage());
-
-    Event saved = eventRepository.save(event);
-    return toDetailResponse(saved);
+    toUpdateEvent(event, updateEventRequest, eventCategory);
+    eventRepository.save(event);
+    return toDetailResponse(event);
   }
 
   public void deleteEvent(Long id) {
@@ -101,22 +102,45 @@ public class EventService {
     eventRepository.deleteById(id);
   }
 
+  private Event toCreateEvent(CreateEventRequest createEventRequest, EventCategory eventCategory) {
+    return Event.builder()
+        .title(createEventRequest.getTitle())
+        .cultCode(createEventRequest.getCultCode())
+        .location(createEventRequest.getLocation())
+        .startDate(createEventRequest.getStartDate())
+        .endDate(createEventRequest.getEndDate())
+        .eventTime(createEventRequest.getEventTime())
+        .recruitTarget(createEventRequest.getRecruitTarget())
+        .price(createEventRequest.getPrice())
+        .inquiry(createEventRequest.getInquiry())
+        .mainImage(createEventRequest.getMainImage())
+        .address(createEventRequest.getAddress())
+        .latitude(createEventRequest.getLatitude())
+        .longitude(createEventRequest.getLongitude())
+        .eventCategory(eventCategory)
+        .build();
+  }
+
+  private void toUpdateEvent(
+      Event event, UpdateEventRequest updateEventRequest, EventCategory eventCategory) {
+
+    event.setTitle(updateEventRequest.getTitle());
+    event.setLocation(updateEventRequest.getLocation());
+    event.setEventCategory(eventCategory);
+    event.setStartDate(updateEventRequest.getStartDate());
+    event.setEndDate(updateEventRequest.getEndDate());
+    event.setPrice(updateEventRequest.getPrice());
+    event.setInquiry(updateEventRequest.getInquiry());
+    event.setAddress(updateEventRequest.getAddress());
+    event.setLatitude(updateEventRequest.getLatitude());
+    event.setLongitude(updateEventRequest.getLongitude());
+    event.setMainImage(updateEventRequest.getMainImage());
+  }
+
   // ------------------------DTO Response------------------------------
   // List 패이지 반환값
-  private EventResponse toListResponse(Event event) {
-    EventResponse response =
-        EventResponse.builder()
-            .id(event.getId())
-            .title(event.getTitle())
-            .cultCode(event.getCultCode())
-            .location(event.getLocation())
-            .startDate(event.getStartDate())
-            .endDate(event.getEndDate())
-            .eventCategory(event.getEventCategory())
-            .mainImage(event.getMainImage())
-            .status(event.getStatus())
-            .build();
-    return response;
+  private ListEventResponse toListEventResponse(Event event) {
+    return null;
   }
 
   // detail 페이지 반환값
