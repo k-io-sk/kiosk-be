@@ -27,7 +27,7 @@ public class Event extends BaseTimeEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(name = "cult_code", nullable = false)
+  @Column(name = "cult_code", nullable = false, unique = true)
   private Long cultCode;
 
   @Column(name = "title", nullable = false)
