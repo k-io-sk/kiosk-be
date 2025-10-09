@@ -7,28 +7,20 @@ import java.time.LocalDate;
 
 import jakarta.validation.constraints.NotBlank;
 
-import com.sku.kiosk.domain.event.entity.EventCategory;
-import com.sku.kiosk.domain.event.entity.Status;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@Schema(title = "DetailEventResponse: 이벤트 상세보기 반환 응답 DTO")
 @Builder
-@Schema(title = "EventResponse DTO", description = "이벤트에 대한 응답 반환")
-public class EventResponse {
-
-  @Schema(description = "", example = "1")
-  private Long id;
-
-  @NotBlank(message = "")
-  @Schema(description = "", example = "234567")
-  private String title;
-
-  @NotBlank(message = "")
-  @Schema(description = "", example = "인사동")
+public class DetailEventResponse {
+  @Schema(description = "", example = "2342124")
   private Long cultCode;
+
+  @NotBlank(message = "")
+  @Schema(description = "", example = "인사동 아트페어")
+  private String title;
 
   @NotBlank(message = "")
   @Schema(description = "", example = "인사동")
@@ -43,30 +35,24 @@ public class EventResponse {
   @Schema(description = "", example = "16:00")
   private String eventTime;
 
-  @Schema(description = "", example = "SHOW")
-  private EventCategory eventCategory;
-
   @Schema(description = "", example = "전체")
   private String recruitTarget;
 
   @Schema(description = "", example = "무료")
   private String price;
 
-  @Schema(description = "", example = "-")
-  private String inquiry;
+  @Schema(description = "", example = "050-1234")
+  private String inquiry; // 문의
 
-  @Schema(description = "", example = "insa.png")
+  @Schema(description = "", example = "image.png")
   private String mainImage;
 
-  @Schema(description = "", example = "종로구 32-3")
+  @Schema(description = "", example = "종로3가 98-3")
   private String address;
 
-  @Schema(description = "", example = "231.43")
+  @Schema(description = "", example = "435.23")
   private Double latitude;
 
-  @Schema(description = "", example = "123.23")
+  @Schema(description = "", example = "352.35")
   private Double longitude;
-
-  @Schema(description = "", example = "ONGOING")
-  private Status status;
 }

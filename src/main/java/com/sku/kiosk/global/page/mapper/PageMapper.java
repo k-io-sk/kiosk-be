@@ -6,6 +6,7 @@ package com.sku.kiosk.global.page.mapper;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
+import com.sku.kiosk.domain.event.dto.response.ListEventResponse;
 import com.sku.kiosk.global.page.response.PageResponse;
 
 @Component
@@ -21,5 +22,10 @@ public class PageMapper {
         .last(page.isLast())
         .first(page.isFirst())
         .build();
+  }
+
+  public PageResponse<ListEventResponse> toPageListEventResponse(
+      Page<ListEventResponse> listEventpage) {
+    return toPageResponse(listEventpage);
   }
 }

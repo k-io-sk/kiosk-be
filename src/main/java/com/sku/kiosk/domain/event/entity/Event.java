@@ -3,10 +3,11 @@
  */
 package com.sku.kiosk.domain.event.entity;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import jakarta.persistence.*;
 
+import com.sku.kiosk.domain.event.dto.request.UpdateEventRequest;
 import com.sku.kiosk.global.common.BaseTimeEntity;
 
 import lombok.AllArgsConstructor;
@@ -37,10 +38,10 @@ public class Event extends BaseTimeEntity {
   private String location;
 
   @Column(name = "start_date")
-  private LocalDateTime startDate;
+  private LocalDate startDate;
 
   @Column(name = "end_date")
-  private LocalDateTime endDate;
+  private LocalDate endDate;
 
   @Column(name = "event_time")
   private String eventTime;
@@ -74,4 +75,21 @@ public class Event extends BaseTimeEntity {
   @Column(name = "status")
   @Builder.Default
   private Status status = Status.ONGOING;
+
+  public void updateEvent(UpdateEventRequest updateEventRequest, EventCategory eventCategory) {
+    this.cultCode = updateEventRequest.getCultCode();
+    this.title = updateEventRequest.getTitle();
+    this.location = updateEventRequest.getLocation();
+    this.startDate = updateEventRequest.getStartDate();
+    this.endDate = updateEventRequest.getEndDate();
+    this.eventTime = updateEventRequest.getEventTime();
+    this.eventCategory = eventCategory;
+    this.recruitTarget = updateEventRequest.getRecruitTarget();
+    this.price = updateEventRequest.getPrice();
+    this.inquiry = updateEventRequest.getInquiry();
+    this.mainImage = updateEventRequest.getMainImage();
+    this.address = updateEventRequest.getAddress();
+    this.latitude = updateEventRequest.getLatitude();
+    this.longitude = updateEventRequest.getLongitude();
+  }
 }

@@ -8,5 +8,5 @@ public enum EventCategory {
   EXHIBITION, // 전시
   FESTIVAL, // 축제
   EDUEXP, // 교육/체험
-  ECT // 기타
+  ETC // 기타
 }
