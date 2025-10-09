@@ -8,10 +8,12 @@ import java.time.LocalDate;
 import jakarta.validation.constraints.NotBlank;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Schema(title = "ListEventResponse: 이벤트 리스트 반환 응답 DTO")
+@Builder
 public class ListEventResponse {
 
   @NotBlank(message = "")

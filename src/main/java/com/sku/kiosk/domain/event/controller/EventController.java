@@ -57,8 +57,9 @@ public class EventController {
 
   // 상세보기
   @Operation(summary = "이벤트 상세보기", description = "이벤트 상세보기 api")
-  @GetMapping("/{id}")
-  public ResponseEntity<BaseResponse<EventResponse>> getEventDetail(@PathVariable Long id) {
+  @GetMapping("/{event-id}")
+  public ResponseEntity<BaseResponse<EventResponse>> getEventDetail(
+      @PathVariable(value = "event-id") Long id) {
     return ResponseEntity.status(200)
         .body(BaseResponse.success(200, "이벤트 상세보기 반환 성공", eventService.getEventDetail(id)));
   }
@@ -84,11 +85,11 @@ public class EventController {
   }
 
   @Operation(summary = "이벤트 수정", description = "관리자가 이벤트 수정을 요청하는 api")
-  @PutMapping("/{id}")
+  @PutMapping("/{event-id}")
   public ResponseEntity<BaseResponse<EventResponse>> updateEvent(
-      @PathVariable Long id,
+      @PathVariable(value = "event-id") Long id,
       @RequestBody @Valid UpdateEventRequest updateEventRequest,
-      @Parameter(description = "이벤트 카테고리", example = "ECT") @RequestParam
+      @Parameter(description = "이벤트 카테고리", example = "ETC") @RequestParam
           EventCategory eventCategory) {
 
     return ResponseEntity.status(200)
@@ -98,9 +99,9 @@ public class EventController {
   }
 
   @Operation(summary = "이벤트 삭제", description = "관리자가 이벤트를 삭제를 요청하는 api")
-  @DeleteMapping("/{id}")
-  public ResponseEntity<BaseResponse<Void>> deleteEvent(@PathVariable Long id) {
+  @DeleteMapping("/{event-id}")
+  public ResponseEntity<BaseResponse<Void>> deleteEvent(@PathVariable(value = "event-id") Long id) {
     eventService.deleteEvent(id);
-    return ResponseEntity.status(204).body(BaseResponse.success(204, "이벤트 삭제 성공", null));
+    return ResponseEntity.status(200).body(BaseResponse.success(204, "이벤트 삭제 성공", null));
   }
 }
