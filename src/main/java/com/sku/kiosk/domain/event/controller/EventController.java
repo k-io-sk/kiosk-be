@@ -7,6 +7,8 @@ import java.util.List;
 
 import jakarta.validation.Valid;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +25,11 @@ import com.sku.kiosk.domain.event.dto.request.UpdateEventRequest;
 import com.sku.kiosk.domain.event.dto.response.EventResponse;
 import com.sku.kiosk.domain.event.dto.response.ListEventResponse;
 import com.sku.kiosk.domain.event.entity.EventCategory;
+import com.sku.kiosk.domain.event.entity.EventPeriod;
 import com.sku.kiosk.domain.event.service.EventService;
+import com.sku.kiosk.global.exception.CustomException;
+import com.sku.kiosk.global.page.exception.PageErrorStatus;
+import com.sku.kiosk.global.page.response.PageResponse;
 import com.sku.kiosk.global.response.BaseResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,22 +43,24 @@ public class EventController {
 
   private final EventService eventService;
 
-  @Operation(summary = "전체 이벤트 리스트 반환", description = "사용자가 전체보기 눌렀을때 이벤트 리스트 반환하는 api")
+  @Operation(summary = "전체/카테고리/기간 별 이벤트 리스트 반환", description = "사용자에게 이벤트 리스트 반환하는 api")
   @GetMapping
-  public ResponseEntity<BaseResponse<List<ListEventResponse>>> getAllEvents() {
-    return ResponseEntity.status(200)
-        .body(BaseResponse.success(200, "전체 이벤트 리스트 반환 성공", eventService.getAllEvents()));
-  }
+  public ResponseEntity<BaseResponse<PageResponse<ListEventResponse>>> getEventList(
+      @Parameter(description = "전체 조회 기준", example = "true") @RequestParam Boolean showAll,
+      @Parameter(description = "이벤트 카테고리", example = "SHOW", required = false) @RequestParam
+          EventCategory eventCategory,
+      @Parameter(description = "이벤트 기간", example = "TODAY") @RequestParam EventPeriod eventPeriod,
+      @Parameter(description = "페이지 번호", example = "1") @RequestParam Integer pageNum,
+      @Parameter(description = "페이지 크기", example = "12") @RequestParam Integer pageSize) {
 
-  @Operation(summary = "카테고리별 이벤트 리스트 반환", description = "사용자가 카테고리 선택시 이벤트 리스트 반환하는 api")
-  @GetMapping("/category/{category}")
-  public ResponseEntity<BaseResponse<List<ListEventResponse>>> getEventsByEventCategory(
-      @Parameter(description = "이벤트 카테고리", example = "SHOW") @RequestParam
-          EventCategory eventCategory) {
+    Pageable pageable = PageRequest.of(pageNum, pageSize);
+
     return ResponseEntity.status(200)
         .body(
             BaseResponse.success(
-                200, "카테고리별 이벤트 리스트 반환 성공", eventService.getEventsByEventCategory(eventCategory)));
+                200,
+                "전체 이벤트 리스트 반환 성공",
+                eventService.getEventList(showAll, eventCategory, eventPeriod, pageable)));
   }
 
   // 상세보기
@@ -103,5 +111,15 @@ public class EventController {
   public ResponseEntity<BaseResponse<Void>> deleteEvent(@PathVariable(value = "event-id") Long id) {
     eventService.deleteEvent(id);
     return ResponseEntity.status(200).body(BaseResponse.success(204, "이벤트 삭제 성공", null));
+  }
+
+  private Pageable validatePageable(Integer pageNum, Integer pageSize) {
+    if (pageNum == null || pageNum < 1) {
+      throw new CustomException(PageErrorStatus.PAGE_NOT_FOUND);
+    }
+    if (pageSize == null || pageSize < 1) {
+      throw new CustomException(PageErrorStatus.PAGE_SIZE_ERROR);
+    }
+    return PageRequest.of(pageNum - 1, pageSize);
   }
 }

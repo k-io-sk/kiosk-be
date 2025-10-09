@@ -17,6 +17,10 @@ import lombok.Getter;
 public class ListEventResponse {
 
   @NotBlank(message = "")
+  @Schema(example = "1")
+  private Long id;
+
+  @NotBlank(message = "")
   @Schema(description = "", example = "인사동 아트페어")
   private String title;
 

@@ -6,6 +6,11 @@ package com.sku.kiosk.domain.event.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,9 +20,12 @@ import com.sku.kiosk.domain.event.dto.response.EventResponse;
 import com.sku.kiosk.domain.event.dto.response.ListEventResponse;
 import com.sku.kiosk.domain.event.entity.Event;
 import com.sku.kiosk.domain.event.entity.EventCategory;
+import com.sku.kiosk.domain.event.entity.EventPeriod;
 import com.sku.kiosk.domain.event.exception.EventErrorCode;
 import com.sku.kiosk.domain.event.repository.EventRepository;
 import com.sku.kiosk.global.exception.CustomException;
+import com.sku.kiosk.global.page.mapper.PageMapper;
+import com.sku.kiosk.global.page.response.PageResponse;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,31 +37,48 @@ public class EventService {
 
   private final EventRepository eventRepository;
 
+  private final PageMapper pageMapper;
+
   // -------------------------조회-----------------------------
-  // 전체보기
   @Transactional(readOnly = true)
-  public List<ListEventResponse> getAllEvents() {
-    List<Event> eventList = eventRepository.findAll();
+  public PageResponse<ListEventResponse> getEventList(
+      Boolean showAll, EventCategory eventCategory, EventPeriod eventPeriod, Pageable pageable) {
 
-    List<ListEventResponse> result = new ArrayList<>();
-    for (Event e : eventList) {
-      result.add(toListEventResponse(e));
+    Pageable sortPageable =
+        PageRequest.of(
+            pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Direction.ASC, "endDate"));
+
+    Page<ListEventResponse> page =
+        eventRepository.findByAll(sortPageable).map(this::toListEventResponse);
+    /*
+    if (showAll && eventCategory == null) {
+      switch (eventPeriod) {
+        case EventPeriod.All:
+          page =
+              eventRepository.findPeriodAllNoCategory(sortPageable).map(this::toListEventResponse);
+          break;
+        case EventPeriod.TODAY:
+          page = eventRepository.findByTodayNoCategory(sortPageable).map(this::toListEventResponse);
+          break;
+        case EventPeriod.THIS_WEEK:
+          page =
+              eventRepository.findByThisWeekNoCategory(sortPageable).map(this::toListEventResponse);
+          break;
+        case EventPeriod.THIS_MONTH:
+          page =
+              eventRepository
+                  .findByThisMonthNoCategory(sortPageable)
+                  .map(this::toListEventResponse);
+          break;
+      }
+
+    } else {
+      page = eventRepository.findByAll(sortPageable).map(this::toListEventResponse);
     }
+    */
+
     log.info("event 전체보기가 성공적으로 조회되었습니다.");
-    return result;
-  }
-
-  // 카테고리별 조회
-  @Transactional(readOnly = true)
-  public List<ListEventResponse> getEventsByEventCategory(EventCategory eventCategory) {
-    List<Event> eventList = eventRepository.findByEventCategory(eventCategory);
-    List<ListEventResponse> result = new ArrayList<>();
-
-    for (Event e : eventList) {
-      result.add(toListEventResponse(e));
-    }
-    log.info("{} 카테고리가 성공적으로 조회되었습니다.", eventCategory.name());
-    return result;
+    return pageMapper.toPageListEventResponse(page);
   }
 
   // title로 검색
@@ -146,6 +171,7 @@ public class EventService {
   private ListEventResponse toListEventResponse(Event event) {
     ListEventResponse listEventResponse =
         ListEventResponse.builder()
+            .id(event.getId())
             .title(event.getTitle())
             .location(event.getLocation())
             .startDate(event.getStartDate())
