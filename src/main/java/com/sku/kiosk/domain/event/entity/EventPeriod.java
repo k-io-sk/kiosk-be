@@ -4,7 +4,7 @@
 package com.sku.kiosk.domain.event.entity;
 
 public enum EventPeriod {
-  All,
+  ALL,
   TODAY,
   THIS_WEEK,
   THIS_MONTH;
