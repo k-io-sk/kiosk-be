@@ -24,6 +24,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class Event extends BaseTimeEntity {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;

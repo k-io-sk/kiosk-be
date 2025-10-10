@@ -4,6 +4,7 @@
 package com.sku.kiosk.domain.event.entity;
 
 public enum EventCategory {
+  ALL, // 전체
   SHOW, // 공연
   EXHIBITION, // 전시
   FESTIVAL, // 축제
