@@ -8,50 +8,52 @@ import java.time.LocalDate;
 import jakarta.validation.constraints.NotBlank;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@Builder
 @Schema(title = "CreateEventRequest: 이벤트 생성 요청 DTO")
 public class CreateEventRequest {
 
-  @Schema(description = "", example = "2342124")
+  @Schema(description = "서울문화포털 문화코드", example = "2342124")
   private Long cultCode;
 
-  @NotBlank(message = "")
-  @Schema(description = "", example = "인사동 아트페어")
+  @NotBlank(message = "행사 제목은 필수입니다.")
+  @Schema(description = "행사 제목", example = "인사동 아트페어")
   private String title;
 
-  @NotBlank(message = "")
-  @Schema(description = "", example = "인사동")
+  @NotBlank(message = "행사 장소는 필수입니다.")
+  @Schema(description = "행사 장소", example = "인사동")
   private String location;
 
-  @Schema(description = "", example = "2025-09-24")
+  @Schema(description = "행사 시작 기간", example = "2025-09-24")
   private LocalDate startDate;
 
-  @Schema(description = "", example = "2025-09-26")
+  @Schema(description = "행사 종료 기간", example = "2025-09-26")
   private LocalDate endDate;
 
-  @Schema(description = "", example = "16:00")
+  @Schema(description = "행사 시작 시간", example = "16:00")
   private String eventTime;
 
-  @Schema(description = "", example = "전체")
+  @Schema(description = "모집 대상", example = "전체")
   private String recruitTarget;
 
-  @Schema(description = "", example = "무료")
+  @Schema(description = "가격", example = "무료")
   private String price;
 
-  @Schema(description = "", example = "050-1234")
-  private String inquiry; // 문의
+  @Schema(description = "문의", example = "050-1234")
+  private String inquiry;
 
-  @Schema(description = "", example = "image.png")
+  @Schema(description = "메인 이미지URL", example = "image.png")
   private String mainImage;
 
-  @Schema(description = "", example = "종로3가 98-3")
+  @Schema(description = "행사 위치 주소", example = "종로3가 98-3")
   private String address;
 
-  @Schema(description = "", example = "435.23")
+  @Schema(description = "행사 위도 좌표", example = "435.23")
   private Double latitude;
 
-  @Schema(description = "", example = "352.35")
+  @Schema(description = "행사 경도 좌표", example = "352.35")
   private Double longitude;
 }
