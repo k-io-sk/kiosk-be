@@ -5,14 +5,11 @@ WORKDIR /app
 COPY ../gradlew .
 COPY ../gradle gradle
 COPY ../build.gradle settings.gradle ./
+COPY ../src src
 
 RUN chmod +x gradlew
 
-RUN ./gradlew dependencies --no-daemon
-
-COPY ../src src
-
-RUN ./gradlew clean build -x test --no-daemon
+RUN ./gradlew clean bootJar -x test --no-daemon
 
 FROM eclipse-temurin:21-jre
 
