@@ -76,6 +76,8 @@ public class SecurityConfig {
                 .permitAll()
                 .requestMatchers("/error")
                 .permitAll()
+                .requestMatchers("/actuator/prometheus")
+                .permitAll()
                 .requestMatchers(RegexRequestMatcher.regexMatcher(".*/admin/.*"))
                 .hasRole("ADMIN")
                 .requestMatchers(RegexRequestMatcher.regexMatcher(".*/dev/.*"))
