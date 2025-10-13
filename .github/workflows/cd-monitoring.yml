@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'docker-compose-monitoring.yml'
+      - 'docker/docker-compose-monitoring.yml'
       - 'docker/grafana/'
       - 'docker/prometheus/'
 
