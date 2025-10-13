@@ -15,12 +15,12 @@ services:
       - '--storage.tsdb.path=/prometheus'
       - '--config.file=/etc/prometheus/prometheus.yml'
     restart: unless-stopped
-    depends_on:
-      - app
 
   grafana:
     image: grafana/grafana
     container_name: grafana
+    networks:
+      - kiosk-network
     ports:
       - "3000:3000"
     environment:
