@@ -5,6 +5,7 @@ on:
     branches:
       - main
     paths:
+      - '.github/workflows/cd-monitoring.yml'
       - 'docker/docker-compose-monitoring.yml'
       - 'docker/grafana/'
       - 'docker/prometheus/'
@@ -19,16 +20,10 @@ jobs:
           token: '${{ secrets.GIT_ACTION_TOKEN }}'
 
       - name: Deploy Monitoring
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ github.ref == 'refs/heads/main' && secrets.SSH_HOST_PROD }}
-          port: ${{ github.ref == 'refs/heads/main' && secrets.SSH_PORT_PROD }}
-          username: ${{ github.ref == 'refs/heads/main' && secrets.SSH_USERNAME_PROD }}
-          key: ${{ github.ref == 'refs/heads/main' && secrets.SSH_PRIVATE_KEY_PROD }}
-          script: |
-            cd /home/ubuntu/actions-runner/_work/kiosk-be/kiosk-be/docker
-            docker compose -f docker-compose-monitoring.yml down
-            docker compose -f docker-compose-monitoring.yml pull
-            docker compose -f docker-compose-monitoring.yml up -d --build
+        run: |
+          cd /home/ubuntu/actions-runner/_work/kiosk-be/kiosk-be/docker
+          docker compose -f docker-compose-monitoring.yml down
+          docker compose -f docker-compose-monitoring.yml pull
+          docker compose -f docker-compose-monitoring.yml up -d --build
         
       
