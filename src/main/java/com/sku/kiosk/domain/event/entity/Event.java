@@ -60,6 +60,9 @@ public class Event extends BaseTimeEntity {
   @Column(name = "inquiry")
   private String inquiry; // 문의
 
+  @Column(name = "detail_url", length = 1000)
+  private String detailUrl;
+
   @Column(name = "main_image")
   private String mainImage;
 
