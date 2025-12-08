@@ -14,6 +14,7 @@ import com.sku.kiosk.domain.event.dto.response.ListEventResponse;
 import com.sku.kiosk.domain.event.dto.response.MainEventResponse;
 import com.sku.kiosk.domain.event.dto.response.WrapperMainEventResponse;
 import com.sku.kiosk.domain.event.entity.EventCategory;
+import com.sku.kiosk.domain.event.entity.EventClassification;
 import com.sku.kiosk.domain.event.entity.EventPeriod;
 import com.sku.kiosk.global.page.response.PageResponse;
 
@@ -73,4 +74,20 @@ public interface EventService {
    * @param eventId 이벤트 식별자
    */
   void deleteEvent(Long eventId);
+
+  /**
+   * 이벤트 분류 문자열을 이벤트 소분류 enum값으로 반환하는 메서드
+   *
+   * @param codename 이벤트 분류 문자열
+   * @return 이벤트 소분류 enum값
+   */
+  EventClassification initClassification(String codename);
+
+  /**
+   * 이벤트 분류 문자열을 대분류 enum값으로 반환하는 메서드
+   *
+   * @param codename 이벤트 분류 문자열
+   * @return 이벤트 대분류 enum값
+   */
+  EventCategory initCategory(String codename);
 }
