@@ -7,6 +7,7 @@ import java.util.List;
 
 import jakarta.validation.Valid;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,11 +38,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public interface EventController {
 
   @Operation(summary = "메인화면 이벤트 이미지 반환", description = "메인화면에서 카테고리별 3개 이벤트 이미지 반환하는 API")
-  @GetMapping("/main")
+  @GetMapping(value = "/main", produces = MediaType.APPLICATION_JSON_VALUE)
   ResponseEntity<BaseResponse<List<WrapperMainEventResponse<MainEventResponse>>>> getMainPage();
 
   @Operation(summary = "전체or카테고리/기간/검색 필터 이벤트 페이지 반환", description = "사용자에게 이벤트 페이지를 반환하는 API")
-  @GetMapping
+  @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   ResponseEntity<BaseResponse<PageResponse<ListEventResponse>>> getEventList(
       @Parameter(description = "이벤트 카테고리", example = "ALL") @RequestParam
           EventCategory eventCategory,
@@ -51,7 +52,7 @@ public interface EventController {
       @Parameter(description = "페이지 크기", example = "12") @RequestParam Integer pageSize);
 
   @Operation(summary = "특정 이벤트 상세보기", description = "특정 이벤트 상세보기 API")
-  @GetMapping("/{event-id}")
+  @GetMapping(value = "/{event-id}", produces = MediaType.APPLICATION_JSON_VALUE)
   ResponseEntity<BaseResponse<DetailEventResponse>> getEventDetail(
       @PathVariable(value = "event-id") Long eventId);
 

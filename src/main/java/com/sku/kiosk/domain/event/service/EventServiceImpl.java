@@ -19,10 +19,7 @@ import com.sku.kiosk.domain.event.dto.response.DetailEventResponse;
 import com.sku.kiosk.domain.event.dto.response.ListEventResponse;
 import com.sku.kiosk.domain.event.dto.response.MainEventResponse;
 import com.sku.kiosk.domain.event.dto.response.WrapperMainEventResponse;
-import com.sku.kiosk.domain.event.entity.Event;
-import com.sku.kiosk.domain.event.entity.EventCategory;
-import com.sku.kiosk.domain.event.entity.EventPeriod;
-import com.sku.kiosk.domain.event.entity.Status;
+import com.sku.kiosk.domain.event.entity.*;
 import com.sku.kiosk.domain.event.exception.EventErrorCode;
 import com.sku.kiosk.domain.event.mapper.EventMapper;
 import com.sku.kiosk.domain.event.repository.EventRepository;
@@ -133,7 +130,6 @@ public class EventServiceImpl implements EventService {
   private Event toCreateEvent(CreateEventRequest createEventRequest, EventCategory eventCategory) {
     return Event.builder()
         .title(createEventRequest.getTitle())
-        .cultCode(createEventRequest.getCultCode())
         .location(createEventRequest.getLocation())
         .startDate(createEventRequest.getStartDate())
         .endDate(createEventRequest.getEndDate())
@@ -142,7 +138,6 @@ public class EventServiceImpl implements EventService {
         .price(createEventRequest.getPrice())
         .inquiry(createEventRequest.getInquiry())
         .mainImage(createEventRequest.getMainImage())
-        .address(createEventRequest.getAddress())
         .latitude(createEventRequest.getLatitude())
         .longitude(createEventRequest.getLongitude())
         .eventCategory(eventCategory)
@@ -197,5 +192,48 @@ public class EventServiceImpl implements EventService {
                   pageable);
     }
     return page;
+  }
+
+  @Override
+  public EventClassification initClassification(String classification) {
+
+    if (classification == null) return EventClassification.ETC;
+
+    classification = classification.trim();
+
+    return switch (classification) {
+      case "교육/체험" -> EventClassification.EDU_EXPERIENCE;
+      case "국악" -> EventClassification.KOREAN_TRADITIONAL;
+      case "기타" -> EventClassification.ETC;
+      case "독주/독창회" -> EventClassification.RECITAL;
+      case "무용" -> EventClassification.DANCE;
+      case "뮤지컬/오페라" -> EventClassification.MUSICAL_OPERA;
+      case "연극" -> EventClassification.PLAY;
+      case "영화" -> EventClassification.MOVIE;
+      case "전시/미술" -> EventClassification.EXHIBITION_ART;
+      case "축제-기타" -> EventClassification.FEST_ETC;
+      case "축제-문화/예술" -> EventClassification.FEST_ART;
+      case "축제-시민화합" -> EventClassification.FEST_CIVIC;
+      case "축제-자연/경관" -> EventClassification.FEST_NATURE;
+      case "축제-전통/역사" -> EventClassification.FEST_HISTORY;
+      case "콘서트" -> EventClassification.CONCERT;
+      case "클래식" -> EventClassification.CLASSICAL;
+      default -> EventClassification.ETC;
+    };
+  }
+
+  @Override
+  public EventCategory initCategory(String classification) {
+    if (classification == null) return EventCategory.ETC;
+    classification = classification.trim();
+
+    return switch (classification) {
+      case "교육/체험" -> EventCategory.EDUEXP;
+      case "영화", "기타" -> EventCategory.ETC;
+      case "국악", "독주/독창회", "무용", "뮤지컬/오페라", "연극", "콘서트", "클래식" -> EventCategory.SHOW;
+      case "축제-기타", "축제-문화/예술", "축제-시민화합", "축제-자연/경관", "축제-전통/역사" -> EventCategory.FESTIVAL;
+      case "전시/미술" -> EventCategory.EXHIBITION;
+      default -> EventCategory.ETC;
+    };
   }
 }
