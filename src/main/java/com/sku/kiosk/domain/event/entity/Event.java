@@ -85,6 +85,9 @@ public class Event extends BaseTimeEntity {
   @Column(name = "event_time")
   private String eventTime;
 
+  @Column(name = "origin_image_url")
+  private String originImageUrl;
+
   @Enumerated(EnumType.STRING)
   @Column(name = "event_category", nullable = false)
   private EventCategory eventCategory;
@@ -109,6 +112,14 @@ public class Event extends BaseTimeEntity {
     this.longitude = updateEventRequest.getLongitude();
   }
 
+  public void updateMainImage(String s3ImageUrl) {
+    this.mainImage = s3ImageUrl;
+  }
+
+  public void updateStatus(Status status) {
+    this.status = status;
+  }
+
   public boolean isSameContent(Event newEvent) {
     return Objects.equals(title, newEvent.title)
         && Objects.equals(location, newEvent.location)
@@ -124,7 +135,6 @@ public class Event extends BaseTimeEntity {
         && Objects.equals(inquiry, newEvent.inquiry)
         && Objects.equals(description, newEvent.description)
         && Objects.equals(orgLink, newEvent.orgLink)
-        && Objects.equals(mainImage, newEvent.mainImage)
         && Objects.equals(latitude, newEvent.latitude)
         && Objects.equals(longitude, newEvent.longitude)
         && Objects.equals(isFree, newEvent.isFree);
@@ -145,7 +155,6 @@ public class Event extends BaseTimeEntity {
     this.inquiry = newEvent.inquiry;
     this.description = newEvent.description;
     this.orgLink = newEvent.orgLink;
-    this.mainImage = newEvent.mainImage;
     this.latitude = newEvent.latitude;
     this.longitude = newEvent.longitude;
     this.isFree = newEvent.isFree;

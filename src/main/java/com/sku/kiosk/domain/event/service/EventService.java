@@ -90,4 +90,10 @@ public interface EventService {
    * @return 이벤트 대분류 enum값
    */
   EventCategory initCategory(String codename);
+
+  /** 매일 00시 10분마다 끝난 행사를 soft delete 하기 위한 메서드 */
+  void schedulingSoftDeleteEvent();
+
+  /** 매주 금요일 00시 30분마다 soft deleted된 행사를 hard delete 하기 위한 메서드 */
+  void schedulingHardDeleteEvent();
 }

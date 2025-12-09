@@ -42,4 +42,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
   Page<Event> findByEventCategoryAndTitleContainingAndStatusOrderByEndDateAsc(
       EventCategory eventCategory, String keyword, Status status, Pageable pageable);
+
+  List<Event> findAllByStatus(Status status);
 }

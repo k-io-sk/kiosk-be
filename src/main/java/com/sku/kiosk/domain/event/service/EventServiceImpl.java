@@ -26,6 +26,7 @@ import com.sku.kiosk.domain.event.repository.EventRepository;
 import com.sku.kiosk.global.exception.CustomException;
 import com.sku.kiosk.global.page.mapper.PageMapper;
 import com.sku.kiosk.global.page.response.PageResponse;
+import com.sku.kiosk.global.s3.service.S3Service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +39,7 @@ public class EventServiceImpl implements EventService {
   private final EventRepository eventRepository;
   private final PageMapper pageMapper;
   private final EventMapper eventMapper;
+  private final S3Service s3Service;
 
   @Override
   @Transactional(readOnly = true)
@@ -125,6 +127,30 @@ public class EventServiceImpl implements EventService {
     }
     log.info("{}번 이벤트가 성공적으로 삭제됐습니다.", eventId);
     eventRepository.deleteById(eventId);
+  }
+
+  @Override
+  @Transactional
+  public void schedulingSoftDeleteEvent() {
+    LocalDate now = LocalDate.now();
+    long softDeletedCount =
+        eventRepository.findAllByStatus(Status.ONGOING).stream()
+            .filter(event -> event.getEndDate().isBefore(now))
+            .peek(event -> event.updateStatus(Status.ENDED))
+            .count();
+    log.info("총 {}개의 지난 이벤트 soft delete 완료.", softDeletedCount);
+  }
+
+  @Override
+  @Transactional
+  public void schedulingHardDeleteEvent() {
+    List<Event> endedEvents = eventRepository.findAllByStatus(Status.ENDED);
+    endedEvents.forEach(
+        event -> {
+          s3Service.deleteFile(s3Service.extractKetNameFromUrl(event.getMainImage()));
+          eventRepository.delete(event);
+        });
+    log.info("총 {}개의 soft deleted 이벤트 hard delete 완료.", endedEvents.size());
   }
 
   private Event toCreateEvent(CreateEventRequest createEventRequest, EventCategory eventCategory) {
