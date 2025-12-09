@@ -5,6 +5,11 @@ package com.sku.kiosk.domain.crawling.service;
 
 import static java.lang.Double.parseDouble;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
@@ -26,9 +31,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import com.sksamuel.scrimage.ImmutableImage;
+import com.sksamuel.scrimage.webp.WebpWriter;
 import com.sku.kiosk.domain.event.entity.Event;
 import com.sku.kiosk.domain.event.repository.EventRepository;
 import com.sku.kiosk.domain.event.service.EventService;
+import com.sku.kiosk.global.s3.entity.PathName;
+import com.sku.kiosk.global.s3.service.S3Service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +49,7 @@ public class CrawlingServiceImpl implements CrawlingService {
 
   private final EventRepository eventRepository;
   private final EventService eventService;
+  private final S3Service s3Service;
 
   @Value("${crawling.openapi.url}")
   private String requestUrl;
@@ -62,6 +72,7 @@ public class CrawlingServiceImpl implements CrawlingService {
   @Override
   @Transactional
   public void updateCrawlingEvent() {
+    long startCrawlingTime = System.currentTimeMillis();
     log.info("[Crawling] Start crawling cultural events");
 
     List<Event> crawledEvents = crawlingEvents();
@@ -82,8 +93,17 @@ public class CrawlingServiceImpl implements CrawlingService {
       Event oldEvent = dbMap.get(newEvent.getCultCode());
 
       if (oldEvent == null) {
+        long startS3UploadTime = System.currentTimeMillis();
+        byte[] output = convertToWebp(newEvent.getOriginImageUrl());
+        String fileType = "webp";
+        String s3ImageUrl =
+            s3Service.uploadWebp(
+                output, s3Service.createKeyName(PathName.MAIN, fileType), fileType);
+        newEvent.updateMainImage(s3ImageUrl);
         toSave.add(newEvent);
+        long endS3UploadTime = System.currentTimeMillis();
         newSize += 1;
+        log.info("[Crawling] s3 업로드 시간: {}", (endS3UploadTime - startS3UploadTime));
         continue;
       }
 
@@ -98,11 +118,13 @@ public class CrawlingServiceImpl implements CrawlingService {
 
     if (!toSave.isEmpty()) eventRepository.saveAll(toSave);
 
+    long endCrawlingTime = System.currentTimeMillis();
     log.info(
-        "[Crawling] Finish crawling cultural events. unchangedSize: {}, newSize: {}, changedSize: {}",
+        "[Crawling] Finish crawling cultural events. unchangedSize: {}, newSize: {}, changedSize: {}, totalTime: {} ms",
         unchangedSize,
         newSize,
-        changedSize);
+        changedSize,
+        (endCrawlingTime - startCrawlingTime));
   }
 
   private List<Event> crawlingEvents() {
@@ -157,7 +179,7 @@ public class CrawlingServiceImpl implements CrawlingService {
                 .inquiry(getText(row, "INQUIRY"))
                 .description(getText(row, "PROGRAM"))
                 .orgLink(getText(row, "ORG_LINK"))
-                .mainImage(getText(row, "MAIN_IMG"))
+                .originImageUrl(getText(row, "MAIN_IMG"))
                 .startDate(toLocalDate(getText(row, "STRTDATE")))
                 .endDate(toLocalDate(getText(row, "END_DATE")))
                 .latitude(parseDouble(getText(row, "LAT")))
@@ -202,5 +224,29 @@ public class CrawlingServiceImpl implements CrawlingService {
     }
 
     return null;
+  }
+
+  private byte[] convertToWebp(String imageUrl) {
+    try {
+      HttpClient client =
+          HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NORMAL).build();
+
+      HttpRequest request = HttpRequest.newBuilder().uri(URI.create(imageUrl)).GET().build();
+      HttpResponse<byte[]> response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
+
+      byte[] imgBytes = response.body();
+      if (imgBytes == null || imgBytes.length == 0) {
+        throw new IOException("이미지 다운로드 실패 (0 byte)");
+      }
+
+      ImmutableImage image = ImmutableImage.loader().fromBytes(imgBytes);
+      WebpWriter writer = WebpWriter.DEFAULT;
+
+      return image.bytes(writer);
+
+    } catch (Exception e) {
+      log.error("[Crawling] 이미지 불러오기 중 오류 발생", e);
+      return new byte[0];
+    }
   }
 }
