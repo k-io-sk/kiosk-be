@@ -48,8 +48,6 @@ dependencies {
 
     //Image Convert
     implementation 'com.twelvemonkeys.imageio:imageio-core:3.10.0'
-    implementation 'com.twelvemonkeys.imageio:imageio-jpeg:3.10.0'
-    implementation 'com.twelvemonkeys.imageio:imageio-png:3.10.0'
     implementation 'com.twelvemonkeys.imageio:imageio-webp:3.10.0'
 
     // AWS S3
