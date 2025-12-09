@@ -47,8 +47,8 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.17.1'
 
     //Image Convert
-    implementation 'com.twelvemonkeys.imageio:imageio-core:3.10.0'
-    implementation 'com.twelvemonkeys.imageio:imageio-webp:3.10.0'
+    implementation "com.sksamuel.scrimage:scrimage-core:4.0.32"
+    implementation "com.sksamuel.scrimage:scrimage-webp:4.0.32"
 
     // AWS S3
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
