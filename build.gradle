@@ -46,6 +46,9 @@ dependencies {
     // Crawling
     implementation 'org.jsoup:jsoup:1.17.1'
 
+    //Image Convert
+    implementation 'com.twelvemonkeys.imageio:imageio-webp:3.9.4'
+
     // Monitoring
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'io.micrometer:micrometer-registry-prometheus'
