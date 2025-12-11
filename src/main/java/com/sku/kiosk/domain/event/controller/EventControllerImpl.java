@@ -18,13 +18,16 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sku.kiosk.domain.event.dto.request.CreateEventRequest;
 import com.sku.kiosk.domain.event.dto.request.UpdateEventRequest;
 import com.sku.kiosk.domain.event.dto.response.DetailEventResponse;
+import com.sku.kiosk.domain.event.dto.response.HomeEventResponse;
 import com.sku.kiosk.domain.event.dto.response.ListEventResponse;
-import com.sku.kiosk.domain.event.dto.response.MainEventResponse;
-import com.sku.kiosk.domain.event.dto.response.WrapperMainEventResponse;
+import com.sku.kiosk.domain.event.dto.response.MbtiEventResponse;
+import com.sku.kiosk.domain.event.dto.response.SummaryEventResponse;
+import com.sku.kiosk.domain.event.dto.response.WrapperHomeEventResponse;
 import com.sku.kiosk.domain.event.entity.EventCategory;
 import com.sku.kiosk.domain.event.entity.EventPeriod;
 import com.sku.kiosk.domain.event.service.EventService;
 import com.sku.kiosk.global.exception.CustomException;
+import com.sku.kiosk.global.exception.GlobalErrorCode;
 import com.sku.kiosk.global.page.exception.PageErrorStatus;
 import com.sku.kiosk.global.page.response.PageResponse;
 import com.sku.kiosk.global.response.BaseResponse;
@@ -38,7 +41,7 @@ public class EventControllerImpl implements EventController {
   private final EventService eventService;
 
   @Override
-  public ResponseEntity<BaseResponse<List<WrapperMainEventResponse<MainEventResponse>>>>
+  public ResponseEntity<BaseResponse<List<WrapperHomeEventResponse<HomeEventResponse>>>>
       getMainPage() {
     return ResponseEntity.status(200)
         .body(BaseResponse.success(200, "메인 화면 이벤트 리스트 반환 성공", eventService.getMainEventList()));
@@ -99,6 +102,36 @@ public class EventControllerImpl implements EventController {
       @PathVariable(value = "event-id") Long eventId) {
     eventService.deleteEvent(eventId);
     return ResponseEntity.status(200).body(BaseResponse.success(204, "이벤트 삭제 성공", null));
+  }
+
+  @Override
+  public ResponseEntity<BaseResponse<List<MbtiEventResponse>>> getRecommend(
+      @RequestParam String mbti) {
+    if (!mbti.matches("[EI][SN][TF][JP]$")) {
+      throw new CustomException(GlobalErrorCode.INVALID_INPUT_VALUE);
+    }
+    return ResponseEntity.status(200)
+        .body(BaseResponse.success(200, "mbti별 이벤트 추천 성공", eventService.getRecommend(mbti)));
+  }
+
+  @Override
+  public ResponseEntity<BaseResponse<List<SummaryEventResponse>>> getRecommendSummary(
+      @RequestParam List<Long> eventIds) {
+    if (eventIds == null || eventIds.size() != 2) {
+      throw new CustomException(GlobalErrorCode.INVALID_INPUT_VALUE);
+    }
+    return ResponseEntity.status(200)
+        .body(
+            BaseResponse.success(
+                200, "추천 이벤트 요약 응답 성공", eventService.getRecommendSummary(eventIds)));
+  }
+
+  @Override
+  public ResponseEntity<BaseResponse<List<ListEventResponse>>> getRandomByCategory() {
+    return ResponseEntity.status(200)
+        .body(
+            BaseResponse.success(
+                200, "메인 화면 카테고리별 랜덤 5개 이벤트 응답 성공", eventService.getRandomByCategory()));
   }
 
   private Pageable validatePageable(Integer pageNum, Integer pageSize) {

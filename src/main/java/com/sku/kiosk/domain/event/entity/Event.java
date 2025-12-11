@@ -56,7 +56,7 @@ public class Event extends BaseTimeEntity {
   private String price;
 
   @Column(name = "inquiry")
-  private String inquiry; // 문의
+  private String inquiry;
 
   @Column(name = "description", columnDefinition = "TEXT")
   private String description;
@@ -97,6 +97,14 @@ public class Event extends BaseTimeEntity {
   @Builder.Default
   private Status status = Status.ONGOING;
 
+  @Column(name = "random_count", nullable = false)
+  @Builder.Default
+  private Long randomCount = 0L;
+
+  @Column(name = "recommend_count", nullable = false)
+  @Builder.Default
+  private Long recommendCount = 0L;
+
   public void updateEvent(UpdateEventRequest updateEventRequest, EventCategory eventCategory) {
     this.title = updateEventRequest.getTitle();
     this.location = updateEventRequest.getLocation();
@@ -118,6 +126,14 @@ public class Event extends BaseTimeEntity {
 
   public void updateStatus(Status status) {
     this.status = status;
+  }
+
+  public void plusRandomCount() {
+    this.randomCount++;
+  }
+
+  public void plusRecommendCount() {
+    this.recommendCount++;
   }
 
   public boolean isSameContent(Event newEvent) {

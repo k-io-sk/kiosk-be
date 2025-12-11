@@ -5,16 +5,14 @@ package com.sku.kiosk.domain.event.dto.response;
 
 import java.time.LocalDate;
 
-import com.sku.kiosk.domain.event.entity.EventCategory;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@Schema(title = "ListEventResponse: 이벤트 리스트 반환 응답 DTO")
 @Builder
-public class ListEventResponse {
+@Schema(title = "SummaryEventResponse: 추천 이벤트 2개 요약 응답 DTO")
+public class SummaryEventResponse {
 
   @Schema(description = "이벤트 식별자", example = "1")
   private Long eventId;
@@ -31,8 +29,17 @@ public class ListEventResponse {
   @Schema(description = "행사 종료 기간", example = "2025-09-26")
   private LocalDate endDate;
 
-  @Schema(description = "행사 카테고리", example = "SHOW")
-  private EventCategory eventCategory;
+  @Schema(description = "행사 진행 시간", example = "16:00")
+  private String eventTime;
+
+  @Schema(description = "행사 대상", example = "만 5세 이상")
+  private String recruitTarget;
+
+  @Schema(description = "요금", example = "무료")
+  private String price;
+
+  @Schema(description = "문의", example = "02-1234-2313")
+  private String inquiry;
 
   @Schema(description = "메인 이미지", example = "image.png")
   private String mainImage;

@@ -8,9 +8,11 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import com.sku.kiosk.domain.event.dto.response.DetailEventResponse;
+import com.sku.kiosk.domain.event.dto.response.HomeEventResponse;
 import com.sku.kiosk.domain.event.dto.response.ListEventResponse;
-import com.sku.kiosk.domain.event.dto.response.MainEventResponse;
-import com.sku.kiosk.domain.event.dto.response.WrapperMainEventResponse;
+import com.sku.kiosk.domain.event.dto.response.MbtiEventResponse;
+import com.sku.kiosk.domain.event.dto.response.SummaryEventResponse;
+import com.sku.kiosk.domain.event.dto.response.WrapperHomeEventResponse;
 import com.sku.kiosk.domain.event.entity.Event;
 
 @Component
@@ -53,16 +55,39 @@ public class EventMapper {
         .build();
   }
 
-  public WrapperMainEventResponse<MainEventResponse> toWrapperMainEventResponse(
+  public WrapperHomeEventResponse<HomeEventResponse> toWrapperMainEventResponse(
       List<Event> events) {
-    return WrapperMainEventResponse.<MainEventResponse>builder()
+    return WrapperHomeEventResponse.<HomeEventResponse>builder()
         .eventCategory(events.getFirst().getEventCategory())
         .events(events.stream().map(this::toMainEventResponse).toList())
         .build();
   }
 
-  private MainEventResponse toMainEventResponse(Event event) {
-    return MainEventResponse.builder()
+  public SummaryEventResponse toSummaryEventResponse(Event event) {
+    return SummaryEventResponse.builder()
+        .eventId(event.getId())
+        .title(event.getTitle())
+        .location(event.getLocation())
+        .startDate(event.getStartDate())
+        .endDate(event.getEndDate())
+        .eventTime(event.getEventTime())
+        .recruitTarget(event.getRecruitTarget())
+        .price(event.getPrice())
+        .inquiry(event.getInquiry())
+        .mainImage(event.getMainImage())
+        .build();
+  }
+
+  public MbtiEventResponse toMbtiEventResponse(Event event) {
+    return MbtiEventResponse.builder()
+        .eventId(event.getId())
+        .title(event.getTitle())
+        .mainImage(event.getMainImage())
+        .build();
+  }
+
+  private HomeEventResponse toMainEventResponse(Event event) {
+    return HomeEventResponse.builder()
         .eventId(event.getId())
         .mainImage(event.getMainImage())
         .eventCategory(event.getEventCategory())

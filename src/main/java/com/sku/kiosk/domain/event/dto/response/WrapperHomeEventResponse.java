@@ -14,7 +14,7 @@ import lombok.Getter;
 @Getter
 @Builder
 @Schema(title = "WrapperMainEventResponse: 메인 화면 이벤트 리스트를 감싸는 반환 응답 DTO")
-public class WrapperMainEventResponse<T> {
+public class WrapperHomeEventResponse<T> {
 
   @Schema(description = "행사 카테고리", example = "SHOW")
   private EventCategory eventCategory;
