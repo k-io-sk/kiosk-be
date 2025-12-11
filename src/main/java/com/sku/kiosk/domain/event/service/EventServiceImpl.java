@@ -12,7 +12,6 @@ import static com.sku.kiosk.domain.event.entity.EventClassification.FEST_HISTORY
 import static com.sku.kiosk.domain.event.entity.EventClassification.KOREAN_TRADITIONAL;
 import static com.sku.kiosk.domain.event.entity.EventClassification.MUSICAL_OPERA;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -79,11 +78,10 @@ public class EventServiceImpl implements EventService {
   @Override
   @Transactional(readOnly = true)
   public PageResponse<ListEventResponse> getEventList(
-      EventCategory eventCategory, EventPeriod eventPeriod, String keyword, Pageable pageable) {
+      EventCategory eventCategory, String keyword, Pageable pageable) {
 
     Page<ListEventResponse> page =
-        toPageListEvent(eventCategory, eventPeriod, keyword, pageable)
-            .map(eventMapper::toListEventResponse);
+        toPageListEvent(eventCategory, keyword, pageable).map(eventMapper::toListEventResponse);
 
     log.info("event 전체보기가 성공적으로 조회되었습니다.");
     return pageMapper.toPageListEventResponse(page);
@@ -311,12 +309,12 @@ public class EventServiceImpl implements EventService {
   }
 
   private Page<Event> toPageListEvent(
-      EventCategory eventCategory, EventPeriod eventPeriod, String keyword, Pageable pageable) {
+      EventCategory eventCategory, String keyword, Pageable pageable) {
 
     Page<Event> page = null;
     if (keyword == null) keyword = "";
 
-    LocalDate today = LocalDate.now();
+    /*LocalDate today = LocalDate.now();
     LocalDate compareWithStartDate = null;
     LocalDate compareWithEndDate = null;
 
@@ -339,23 +337,16 @@ public class EventServiceImpl implements EventService {
         break;
       default:
         break;
-    }
+    }*/
 
     if (EventCategory.ALL == eventCategory) {
       page =
-          eventRepository
-              .findByTitleContainingAndStartDateLessThanEqualAndEndDateGreaterThanEqualAndStatusOrderByEndDateAsc(
-                  keyword, compareWithStartDate, compareWithEndDate, Status.ONGOING, pageable);
+          eventRepository.findByTitleContainingAndStatusOrderByEndDateAsc(
+              keyword, Status.ONGOING, pageable);
     } else {
       page =
-          eventRepository
-              .findByEventCategoryAndTitleContainingAndStartDateLessThanEqualAndEndDateGreaterThanEqualAndStatusOrderByEndDateAsc(
-                  eventCategory,
-                  keyword,
-                  compareWithStartDate,
-                  compareWithEndDate,
-                  Status.ONGOING,
-                  pageable);
+          eventRepository.findByEventCategoryAndTitleContainingAndStatusOrderByEndDateAsc(
+              eventCategory, keyword, Status.ONGOING, pageable);
     }
     return page;
   }

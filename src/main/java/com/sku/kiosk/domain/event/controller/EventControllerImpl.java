@@ -24,7 +24,6 @@ import com.sku.kiosk.domain.event.dto.response.MbtiEventResponse;
 import com.sku.kiosk.domain.event.dto.response.SummaryEventResponse;
 import com.sku.kiosk.domain.event.dto.response.WrapperHomeEventResponse;
 import com.sku.kiosk.domain.event.entity.EventCategory;
-import com.sku.kiosk.domain.event.entity.EventPeriod;
 import com.sku.kiosk.domain.event.service.EventService;
 import com.sku.kiosk.global.exception.CustomException;
 import com.sku.kiosk.global.exception.GlobalErrorCode;
@@ -50,7 +49,6 @@ public class EventControllerImpl implements EventController {
   @Override
   public ResponseEntity<BaseResponse<PageResponse<ListEventResponse>>> getEventList(
       @RequestParam EventCategory eventCategory,
-      @RequestParam EventPeriod eventPeriod,
       @RequestParam(required = false) String keyword,
       @RequestParam Integer pageNum,
       @RequestParam Integer pageSize) {
@@ -62,7 +60,7 @@ public class EventControllerImpl implements EventController {
             BaseResponse.success(
                 200,
                 "전체 이벤트 리스트 반환 성공",
-                eventService.getEventList(eventCategory, eventPeriod, keyword, pageable)));
+                eventService.getEventList(eventCategory, keyword, pageable)));
   }
 
   @Override

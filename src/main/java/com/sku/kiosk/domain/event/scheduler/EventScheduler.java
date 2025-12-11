@@ -3,6 +3,8 @@
  */
 package com.sku.kiosk.domain.event.scheduler;
 
+import java.time.LocalDate;
+
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -21,8 +23,12 @@ public class EventScheduler {
     eventService.schedulingSoftDeleteEvent();
   }
 
-  @Scheduled(cron = "0 30 0 * * 5")
+  @Scheduled(cron = "0 30 0 * * *")
   public void weeklyHardDeletion() {
-    eventService.schedulingHardDeleteEvent();
+    LocalDate today = LocalDate.now();
+    LocalDate tomorrow = LocalDate.now().plusDays(1);
+    if (tomorrow.getMonth() != today.getMonth()) {
+      eventService.schedulingHardDeleteEvent();
+    }
   }
 }
