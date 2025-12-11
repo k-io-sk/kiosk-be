@@ -10,9 +10,11 @@ import org.springframework.data.domain.Pageable;
 import com.sku.kiosk.domain.event.dto.request.CreateEventRequest;
 import com.sku.kiosk.domain.event.dto.request.UpdateEventRequest;
 import com.sku.kiosk.domain.event.dto.response.DetailEventResponse;
+import com.sku.kiosk.domain.event.dto.response.HomeEventResponse;
 import com.sku.kiosk.domain.event.dto.response.ListEventResponse;
-import com.sku.kiosk.domain.event.dto.response.MainEventResponse;
-import com.sku.kiosk.domain.event.dto.response.WrapperMainEventResponse;
+import com.sku.kiosk.domain.event.dto.response.MbtiEventResponse;
+import com.sku.kiosk.domain.event.dto.response.SummaryEventResponse;
+import com.sku.kiosk.domain.event.dto.response.WrapperHomeEventResponse;
 import com.sku.kiosk.domain.event.entity.EventCategory;
 import com.sku.kiosk.domain.event.entity.EventClassification;
 import com.sku.kiosk.domain.event.entity.EventPeriod;
@@ -25,7 +27,7 @@ public interface EventService {
    *
    * @return 카테고리별 MainEventResponse 리스트
    */
-  List<WrapperMainEventResponse<MainEventResponse>> getMainEventList();
+  List<WrapperHomeEventResponse<HomeEventResponse>> getMainEventList();
 
   /**
    * 전체or카테고리/기간/검색 필터를 통한 이벤트 페이지 반환 메서드
@@ -90,6 +92,29 @@ public interface EventService {
    * @return 이벤트 대분류 enum값
    */
   EventCategory initCategory(String codename);
+
+  /**
+   * MBTI를 입력해 해당 mbti에 맞는 이벤트를 반환하는 메서드
+   *
+   * @param mbti MBTI 문자열
+   * @return MBTI를 통해 추천 받은 이벤트 리스트
+   */
+  List<MbtiEventResponse> getRecommend(String mbti);
+
+  /**
+   * mbti를 입력하여 추천 받은 2개의 이벤트들의 요약을 반환하는 메서드
+   *
+   * @param eventIds 추천 받은 2개의 이벤트 식별자들
+   * @return 해당 식별자를 pk로 갖는 이벤트들의 요약 응답 리스트
+   */
+  List<SummaryEventResponse> getRecommendSummary(List<Long> eventIds);
+
+  /**
+   * 메인 화면에서 카테고리별 랜덤 5개 띄울 이벤트 리스트를 반환하는 메서드
+   *
+   * @return 카테고리별 랜덤 5개의 이벤트
+   */
+  List<ListEventResponse> getRandomByCategory();
 
   /** 매일 00시 10분마다 끝난 행사를 soft delete 하기 위한 메서드 */
   void schedulingSoftDeleteEvent();

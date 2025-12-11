@@ -3,10 +3,23 @@
  */
 package com.sku.kiosk.domain.event.service;
 
+import static com.sku.kiosk.domain.event.entity.EventClassification.CLASSICAL;
+import static com.sku.kiosk.domain.event.entity.EventClassification.CONCERT;
+import static com.sku.kiosk.domain.event.entity.EventClassification.DANCE;
+import static com.sku.kiosk.domain.event.entity.EventClassification.EDU_EXPERIENCE;
+import static com.sku.kiosk.domain.event.entity.EventClassification.ETC;
+import static com.sku.kiosk.domain.event.entity.EventClassification.FEST_HISTORY;
+import static com.sku.kiosk.domain.event.entity.EventClassification.KOREAN_TRADITIONAL;
+import static com.sku.kiosk.domain.event.entity.EventClassification.MUSICAL_OPERA;
+
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,9 +29,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.sku.kiosk.domain.event.dto.request.CreateEventRequest;
 import com.sku.kiosk.domain.event.dto.request.UpdateEventRequest;
 import com.sku.kiosk.domain.event.dto.response.DetailEventResponse;
+import com.sku.kiosk.domain.event.dto.response.HomeEventResponse;
 import com.sku.kiosk.domain.event.dto.response.ListEventResponse;
-import com.sku.kiosk.domain.event.dto.response.MainEventResponse;
-import com.sku.kiosk.domain.event.dto.response.WrapperMainEventResponse;
+import com.sku.kiosk.domain.event.dto.response.MbtiEventResponse;
+import com.sku.kiosk.domain.event.dto.response.SummaryEventResponse;
+import com.sku.kiosk.domain.event.dto.response.WrapperHomeEventResponse;
 import com.sku.kiosk.domain.event.entity.*;
 import com.sku.kiosk.domain.event.exception.EventErrorCode;
 import com.sku.kiosk.domain.event.mapper.EventMapper;
@@ -43,7 +58,7 @@ public class EventServiceImpl implements EventService {
 
   @Override
   @Transactional(readOnly = true)
-  public List<WrapperMainEventResponse<MainEventResponse>> getMainEventList() {
+  public List<WrapperHomeEventResponse<HomeEventResponse>> getMainEventList() {
 
     List<Event> exhibitionEvents =
         eventRepository.findTop3ByEventCategoryOrderByEndDateAsc(EventCategory.EXHIBITION);
@@ -52,7 +67,7 @@ public class EventServiceImpl implements EventService {
     List<Event> festivalEvents =
         eventRepository.findTop3ByEventCategoryOrderByEndDateAsc(EventCategory.FESTIVAL);
 
-    List<WrapperMainEventResponse<MainEventResponse>> result = new ArrayList<>();
+    List<WrapperHomeEventResponse<HomeEventResponse>> result = new ArrayList<>();
 
     result.add(eventMapper.toWrapperMainEventResponse(exhibitionEvents));
     result.add(eventMapper.toWrapperMainEventResponse(showEvents));
@@ -153,6 +168,131 @@ public class EventServiceImpl implements EventService {
     log.info("총 {}개의 soft deleted 이벤트 hard delete 완료.", endedEvents.size());
   }
 
+  @Override
+  @Transactional
+  public List<MbtiEventResponse> getRecommend(String mbti) {
+    Map<EventClassification, Integer> weightScore = new HashMap<>();
+    for (EventClassification eventClassification : EventClassification.values()) {
+      weightScore.put(
+          eventClassification,
+          weightScore.getOrDefault(eventClassification, 0)
+              + MbtiWeightTable.calculateScore(mbti, eventClassification));
+    }
+
+    List<EventClassification> sortedKeys =
+        weightScore.entrySet().stream()
+            .sorted(Map.Entry.<EventClassification, Integer>comparingByValue().reversed())
+            .map(Map.Entry::getKey)
+            .toList();
+
+    List<MbtiEventResponse> recommendEvents = new ArrayList<>();
+    for (EventClassification eventClassification : sortedKeys) {
+      if (recommendEvents.size() == 2) break;
+      Optional<Event> optionalEvent =
+          eventRepository.findFirstByEventClassificationOrderByRecommendCountAsc(
+              eventClassification);
+      if (optionalEvent.isEmpty()) continue;
+      Event event = optionalEvent.get();
+      event.plusRecommendCount();
+      recommendEvents.add(eventMapper.toMbtiEventResponse(event));
+    }
+    if (recommendEvents.size() < 2) {
+      log.error("{} mbti에 총 {}개의 이벤트만 추천 되었습니다.", mbti, recommendEvents.size());
+      throw new CustomException(EventErrorCode.EVENT_NOT_RECOMMENDED);
+    }
+    log.info(
+        "{} mbti에 {}, {}번 이벤트가 추천 되었습니다.",
+        mbti,
+        recommendEvents.get(0).getEventId(),
+        recommendEvents.get(1).getEventId());
+    return recommendEvents;
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public List<SummaryEventResponse> getRecommendSummary(List<Long> eventIds) {
+    List<SummaryEventResponse> events = new ArrayList<>();
+    for (Long eventId : eventIds) {
+      Event event =
+          eventRepository
+              .findById(eventId)
+              .orElseThrow(
+                  () -> {
+                    log.error("{}번 이벤트를 찾을 수 없습니다.", eventId);
+                    return new CustomException(EventErrorCode.EVENT_NOT_FOUND);
+                  });
+      events.add(eventMapper.toSummaryEventResponse(event));
+    }
+    log.info("{}, {}번 이벤트 요약 응답 조회 완료", eventIds.get(0), eventIds.get(1));
+    return events;
+  }
+
+  @Override
+  @Transactional
+  public List<ListEventResponse> getRandomByCategory() {
+    List<Object[]> minResults = eventRepository.findMinRandomCountPerCategory();
+    List<ListEventResponse> events = new ArrayList<>();
+    Random random = new Random();
+
+    for (Object[] row : minResults) {
+      EventCategory eventCategory = (EventCategory) row[0];
+      Long minRandomCount = (Long) row[1];
+
+      List<Event> candidates =
+          eventRepository.findByEventCategoryAndRandomCount(eventCategory, minRandomCount);
+      if (!candidates.isEmpty()) {
+        Event event = candidates.get(random.nextInt(candidates.size()));
+        event.plusRandomCount();
+        events.add(eventMapper.toListEventResponse(event));
+      }
+    }
+    log.info("총 {}개의 카테고리별 이벤트 랜덤 추천 완료", minResults.size());
+    return events;
+  }
+
+  @Override
+  public EventClassification initClassification(String classification) {
+
+    if (classification == null) return ETC;
+
+    classification = classification.trim();
+
+    return switch (classification) {
+      case "교육/체험" -> EDU_EXPERIENCE;
+      case "국악" -> KOREAN_TRADITIONAL;
+      case "기타" -> ETC;
+      case "독주/독창회" -> EventClassification.RECITAL;
+      case "무용" -> DANCE;
+      case "뮤지컬/오페라" -> MUSICAL_OPERA;
+      case "연극" -> EventClassification.PLAY;
+      case "영화" -> EventClassification.MOVIE;
+      case "전시/미술" -> EventClassification.EXHIBITION_ART;
+      case "축제-기타" -> EventClassification.FEST_ETC;
+      case "축제-문화/예술" -> EventClassification.FEST_ART;
+      case "축제-시민화합" -> EventClassification.FEST_CIVIC;
+      case "축제-자연/경관" -> EventClassification.FEST_NATURE;
+      case "축제-전통/역사" -> FEST_HISTORY;
+      case "콘서트" -> CONCERT;
+      case "클래식" -> CLASSICAL;
+      default -> ETC;
+    };
+  }
+
+  @Override
+  public EventCategory initCategory(String classification) {
+    if (classification == null) return EventCategory.ETC;
+    classification = classification.trim();
+
+    return switch (classification) {
+      case "교육/체험" -> EventCategory.EDUEXP;
+      case "영화", "기타" -> EventCategory.ETC;
+      case "국악", "독주/독창회", "무용", "뮤지컬/오페라", "연극", "콘서트", "클래식" -> EventCategory.SHOW;
+      case "축제-기타", "축제-문화/예술", "축제-시민화합", "축제-자연/경관", "축제-전통/역사" -> EventCategory.FESTIVAL;
+      case "전시/미술" -> EventCategory.EXHIBITION;
+      default -> EventCategory.ETC;
+    };
+  }
+
   private Event toCreateEvent(CreateEventRequest createEventRequest, EventCategory eventCategory) {
     return Event.builder()
         .title(createEventRequest.getTitle())
@@ -218,48 +358,5 @@ public class EventServiceImpl implements EventService {
                   pageable);
     }
     return page;
-  }
-
-  @Override
-  public EventClassification initClassification(String classification) {
-
-    if (classification == null) return EventClassification.ETC;
-
-    classification = classification.trim();
-
-    return switch (classification) {
-      case "교육/체험" -> EventClassification.EDU_EXPERIENCE;
-      case "국악" -> EventClassification.KOREAN_TRADITIONAL;
-      case "기타" -> EventClassification.ETC;
-      case "독주/독창회" -> EventClassification.RECITAL;
-      case "무용" -> EventClassification.DANCE;
-      case "뮤지컬/오페라" -> EventClassification.MUSICAL_OPERA;
-      case "연극" -> EventClassification.PLAY;
-      case "영화" -> EventClassification.MOVIE;
-      case "전시/미술" -> EventClassification.EXHIBITION_ART;
-      case "축제-기타" -> EventClassification.FEST_ETC;
-      case "축제-문화/예술" -> EventClassification.FEST_ART;
-      case "축제-시민화합" -> EventClassification.FEST_CIVIC;
-      case "축제-자연/경관" -> EventClassification.FEST_NATURE;
-      case "축제-전통/역사" -> EventClassification.FEST_HISTORY;
-      case "콘서트" -> EventClassification.CONCERT;
-      case "클래식" -> EventClassification.CLASSICAL;
-      default -> EventClassification.ETC;
-    };
-  }
-
-  @Override
-  public EventCategory initCategory(String classification) {
-    if (classification == null) return EventCategory.ETC;
-    classification = classification.trim();
-
-    return switch (classification) {
-      case "교육/체험" -> EventCategory.EDUEXP;
-      case "영화", "기타" -> EventCategory.ETC;
-      case "국악", "독주/독창회", "무용", "뮤지컬/오페라", "연극", "콘서트", "클래식" -> EventCategory.SHOW;
-      case "축제-기타", "축제-문화/예술", "축제-시민화합", "축제-자연/경관", "축제-전통/역사" -> EventCategory.FESTIVAL;
-      case "전시/미술" -> EventCategory.EXHIBITION;
-      default -> EventCategory.ETC;
-    };
   }
 }
