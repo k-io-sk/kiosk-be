@@ -34,6 +34,6 @@ public class ListEventResponse {
   @Schema(description = "행사 카테고리", example = "SHOW")
   private EventCategory eventCategory;
 
-  @Schema(description = "", example = "image.png")
+  @Schema(description = "메인 이미지", example = "image.png")
   private String mainImage;
 }

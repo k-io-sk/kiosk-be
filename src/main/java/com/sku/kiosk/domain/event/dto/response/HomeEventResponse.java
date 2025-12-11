@@ -12,7 +12,7 @@ import lombok.Getter;
 @Getter
 @Builder
 @Schema(title = "MainEventResponse: 메인 화면 이벤트 리스트 반환 응답 DTO")
-public class MainEventResponse {
+public class HomeEventResponse {
 
   @Schema(description = "이벤트 식별자", example = "2")
   private Long eventId;
