@@ -17,7 +17,6 @@ import com.sku.kiosk.domain.event.dto.response.SummaryEventResponse;
 import com.sku.kiosk.domain.event.dto.response.WrapperHomeEventResponse;
 import com.sku.kiosk.domain.event.entity.EventCategory;
 import com.sku.kiosk.domain.event.entity.EventClassification;
-import com.sku.kiosk.domain.event.entity.EventPeriod;
 import com.sku.kiosk.global.page.response.PageResponse;
 
 public interface EventService {
@@ -39,7 +38,7 @@ public interface EventService {
    * @return
    */
   PageResponse<ListEventResponse> getEventList(
-      EventCategory eventCategory, EventPeriod eventPeriod, String keyword, Pageable pageable);
+      EventCategory eventCategory, String keyword, Pageable pageable);
 
   /**
    * 특정 이벤트 상세 조회 메서드
