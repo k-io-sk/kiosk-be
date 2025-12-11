@@ -27,7 +27,6 @@ import com.sku.kiosk.domain.event.dto.response.MbtiEventResponse;
 import com.sku.kiosk.domain.event.dto.response.SummaryEventResponse;
 import com.sku.kiosk.domain.event.dto.response.WrapperHomeEventResponse;
 import com.sku.kiosk.domain.event.entity.EventCategory;
-import com.sku.kiosk.domain.event.entity.EventPeriod;
 import com.sku.kiosk.global.page.response.PageResponse;
 import com.sku.kiosk.global.response.BaseResponse;
 
@@ -43,12 +42,11 @@ public interface EventController {
   @GetMapping(value = "/main", produces = MediaType.APPLICATION_JSON_VALUE)
   ResponseEntity<BaseResponse<List<WrapperHomeEventResponse<HomeEventResponse>>>> getMainPage();
 
-  @Operation(summary = "전체or카테고리/기간/검색 필터 이벤트 페이지 반환", description = "사용자에게 이벤트 페이지를 반환하는 API")
+  @Operation(summary = "전체or카테고리/검색 필터 이벤트 페이지 반환", description = "사용자에게 이벤트 페이지를 반환하는 API")
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   ResponseEntity<BaseResponse<PageResponse<ListEventResponse>>> getEventList(
       @Parameter(description = "이벤트 카테고리", example = "ALL") @RequestParam
           EventCategory eventCategory,
-      @Parameter(description = "이벤트 기간", example = "ALL") @RequestParam EventPeriod eventPeriod,
       @Parameter(description = "검색어") @RequestParam(required = false) String keyword,
       @Parameter(description = "페이지 번호", example = "1") @RequestParam Integer pageNum,
       @Parameter(description = "페이지 크기", example = "12") @RequestParam Integer pageSize);
