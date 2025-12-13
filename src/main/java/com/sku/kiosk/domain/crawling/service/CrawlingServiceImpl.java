@@ -177,7 +177,7 @@ public class CrawlingServiceImpl implements CrawlingService {
                 .recruitTarget(getText(row, "USE_TRGT"))
                 .price(getText(row, "USE_FEE"))
                 .inquiry(getText(row, "INQUIRY"))
-                .description(getText(row, "PROGRAM"))
+                .description(extractDescription(getText(row, "PROGRAM")))
                 .orgLink(getText(row, "ORG_LINK"))
                 .originImageUrl(getText(row, "MAIN_IMG"))
                 .startDate(toLocalDate(getText(row, "STRTDATE")))
@@ -224,6 +224,14 @@ public class CrawlingServiceImpl implements CrawlingService {
     }
 
     return null;
+  }
+
+  private String extractDescription(String description) {
+    if (description == null || description.isBlank()) return "";
+    if (description.matches(".*[가-힣].*")) {
+      return description;
+    }
+    return "";
   }
 
   private byte[] convertToWebp(String imageUrl) {
