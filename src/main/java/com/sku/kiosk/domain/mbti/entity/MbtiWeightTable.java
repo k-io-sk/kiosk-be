@@ -1,7 +1,7 @@
 /* 
  * Copyright (c) SKU K-IO-SK 
  */
-package com.sku.kiosk.domain.event.entity;
+package com.sku.kiosk.domain.mbti.entity;
 
 import static com.sku.kiosk.domain.event.entity.EventClassification.CLASSICAL;
 import static com.sku.kiosk.domain.event.entity.EventClassification.CONCERT;
@@ -21,6 +21,8 @@ import static com.sku.kiosk.domain.event.entity.EventClassification.PLAY;
 import static com.sku.kiosk.domain.event.entity.EventClassification.RECITAL;
 
 import java.util.Map;
+
+import com.sku.kiosk.domain.event.entity.EventClassification;
 
 public final class MbtiWeightTable {
   public static final Map<EventClassification, Integer[]> weightEI =
