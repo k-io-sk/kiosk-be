@@ -37,6 +37,8 @@ import com.sku.kiosk.domain.event.entity.*;
 import com.sku.kiosk.domain.event.exception.EventErrorCode;
 import com.sku.kiosk.domain.event.mapper.EventMapper;
 import com.sku.kiosk.domain.event.repository.EventRepository;
+import com.sku.kiosk.domain.mbti.entity.MbtiWeightTable;
+import com.sku.kiosk.domain.mbti.service.MbtiService;
 import com.sku.kiosk.global.exception.CustomException;
 import com.sku.kiosk.global.page.mapper.PageMapper;
 import com.sku.kiosk.global.page.response.PageResponse;
@@ -54,6 +56,7 @@ public class EventServiceImpl implements EventService {
   private final PageMapper pageMapper;
   private final EventMapper eventMapper;
   private final S3Service s3Service;
+  private final MbtiService mbtiService;
 
   @Override
   @Transactional(readOnly = true)
@@ -198,6 +201,7 @@ public class EventServiceImpl implements EventService {
       log.error("{} mbti에 총 {}개의 이벤트만 추천 되었습니다.", mbti, recommendEvents.size());
       throw new CustomException(EventErrorCode.EVENT_NOT_RECOMMENDED);
     }
+    mbtiService.increaseCount(mbti);
     log.info(
         "{} mbti에 {}, {}번 이벤트가 추천 되었습니다.",
         mbti,

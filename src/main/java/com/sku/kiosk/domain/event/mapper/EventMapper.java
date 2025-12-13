@@ -33,9 +33,6 @@ public class EventMapper {
   public DetailEventResponse toDetailResponse(Event event) {
     return DetailEventResponse.builder()
         .eventId(event.getId())
-        .cultCode(event.getCultCode())
-        .eventClassification(event.getEventClassification())
-        .gu(event.getGu())
         .title(event.getTitle())
         .location(event.getLocation())
         .orgName(event.getOrgName())
