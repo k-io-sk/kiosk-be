@@ -26,13 +26,13 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.parser.Parser;
 import org.jsoup.select.Elements;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import com.sksamuel.scrimage.ImmutableImage;
 import com.sksamuel.scrimage.webp.WebpWriter;
+import com.sku.kiosk.domain.crawling.props.JongnoCrawlingProperties;
 import com.sku.kiosk.domain.event.entity.Event;
 import com.sku.kiosk.domain.event.repository.EventRepository;
 import com.sku.kiosk.domain.event.service.EventService;
@@ -51,23 +51,17 @@ public class CrawlingServiceImpl implements CrawlingService {
   private final EventService eventService;
   private final S3Service s3Service;
 
-  @Value("${crawling.openapi.url}")
-  private String requestUrl;
+  private final JongnoCrawlingProperties props;
+  private final RestTemplate restTemplate;
+  private final HttpClient httpClient;
 
-  @Value("${crawling.authentication.key}")
-  private String authenticationKey;
+  private static final DateTimeFormatter OPENAPI_DATE_FORMATTER =
+      DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
 
-  @Value("${crawling.data.type}")
-  private String dataType;
+  private static final Pattern CULTCODE_PATTERN = Pattern.compile("cultcode=([^&]+)");
 
-  @Value("${crawling.data.service}")
-  private String dataService;
-
-  private final Integer startIndex = 1;
-  private final Integer endIndex = 400;
-  private final String codeName = "%20";
-  private final String title = "%20";
-  private final YearMonth date = YearMonth.now();
+  private static final WebpWriter WEBP_WRITER = WebpWriter.DEFAULT;
+  private static final String WEBP = "webp";
 
   @Override
   @Transactional
@@ -95,10 +89,8 @@ public class CrawlingServiceImpl implements CrawlingService {
       if (oldEvent == null) {
         long startS3UploadTime = System.currentTimeMillis();
         byte[] output = convertToWebp(newEvent.getOriginImageUrl());
-        String fileType = "webp";
         String s3ImageUrl =
-            s3Service.uploadWebp(
-                output, s3Service.createKeyName(PathName.MAIN, fileType), fileType);
+            s3Service.uploadWebp(output, s3Service.createKeyName(PathName.MAIN, WEBP), WEBP);
         newEvent.updateMainImage(s3ImageUrl);
         toSave.add(newEvent);
         long endS3UploadTime = System.currentTimeMillis();
@@ -129,28 +121,29 @@ public class CrawlingServiceImpl implements CrawlingService {
 
   private List<Event> crawlingEvents() {
     try {
+      YearMonth currentMonth = YearMonth.now();
+
       String url =
-          requestUrl
+          props.getRequestUrl()
               + "/"
-              + authenticationKey
+              + props.getAuthenticationKey()
               + "/"
-              + dataType
+              + props.getDataType()
               + "/"
-              + dataService
+              + props.getDataService()
               + "/"
-              + startIndex
+              + props.getStartIndex()
               + "/"
-              + endIndex
+              + props.getEndIndex()
               + "/"
-              + codeName
+              + props.getCodeName()
               + "/"
-              + title
+              + props.getTitle()
               + "/"
-              + date;
+              + currentMonth;
 
       log.info("[Crawling] events url: {}", url);
 
-      RestTemplate restTemplate = new RestTemplate();
       String responseXml = restTemplate.getForObject(url, String.class);
 
       if (responseXml == null || responseXml.isBlank()) {
@@ -207,22 +200,16 @@ public class CrawlingServiceImpl implements CrawlingService {
 
   private LocalDate toLocalDate(String text) {
     if (text == null || text.isBlank()) return null;
-
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
-
-    return LocalDateTime.parse(text, formatter).toLocalDate();
+    return LocalDateTime.parse(text, OPENAPI_DATE_FORMATTER).toLocalDate();
   }
 
   private Long extractCultcode(String url) {
     if (url == null || url.isBlank()) return null;
 
-    Pattern pattern = Pattern.compile("cultcode=([^&]+)");
-    Matcher matcher = pattern.matcher(url);
-
+    Matcher matcher = CULTCODE_PATTERN.matcher(url);
     if (matcher.find()) {
       return Long.parseLong(matcher.group(1)); // cultcode 값만 반환
     }
-
     return null;
   }
 
@@ -236,11 +223,9 @@ public class CrawlingServiceImpl implements CrawlingService {
 
   private byte[] convertToWebp(String imageUrl) {
     try {
-      HttpClient client =
-          HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NORMAL).build();
-
       HttpRequest request = HttpRequest.newBuilder().uri(URI.create(imageUrl)).GET().build();
-      HttpResponse<byte[]> response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
+      HttpResponse<byte[]> response =
+          httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
 
       byte[] imgBytes = response.body();
       if (imgBytes == null || imgBytes.length == 0) {
@@ -248,9 +233,8 @@ public class CrawlingServiceImpl implements CrawlingService {
       }
 
       ImmutableImage image = ImmutableImage.loader().fromBytes(imgBytes);
-      WebpWriter writer = WebpWriter.DEFAULT;
 
-      return image.bytes(writer);
+      return image.bytes(WEBP_WRITER);
 
     } catch (Exception e) {
       log.error("[Crawling] 이미지 불러오기 중 오류 발생", e);
