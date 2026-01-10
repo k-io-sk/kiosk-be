@@ -94,8 +94,7 @@ public class Event extends BaseTimeEntity {
 
   @Enumerated(EnumType.STRING)
   @Column(name = "status")
-  @Builder.Default
-  private Status status = Status.ONGOING;
+  private Status status;
 
   @Column(name = "random_count", nullable = false)
   @Builder.Default
