@@ -31,4 +31,9 @@ public class EventScheduler {
       eventService.schedulingHardDeleteEvent();
     }
   }
+
+  @Scheduled(cron = "0 15 0 * * *")
+  public void dailyChangeComingToOnGoingEvent() {
+    eventService.schedulingChangeComingToOnGoingEvent();
+  }
 }
