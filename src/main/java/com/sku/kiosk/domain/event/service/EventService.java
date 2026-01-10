@@ -118,6 +118,11 @@ public interface EventService {
   /** 매일 00시 10분마다 끝난 행사를 soft delete 하기 위한 메서드 */
   void schedulingSoftDeleteEvent();
 
-  /** 매주 금요일 00시 30분마다 soft deleted된 행사를 hard delete 하기 위한 메서드 */
+  /** 매월 마지막 날 00시 30분마다 soft deleted된 행사를 hard delete 하기 위한 메서드 */
   void schedulingHardDeleteEvent();
+
+  /** 매일 00시 15분마다 다가올 예정인 행사를 오늘의 행사로 변경하기 위한 메서드 */
+  void schedulingChangeComingToOnGoingEvent();
+
+  public void initStatus();
 }

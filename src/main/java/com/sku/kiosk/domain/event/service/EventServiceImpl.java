@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -171,6 +172,23 @@ public class EventServiceImpl implements EventService {
 
   @Override
   @Transactional
+  public void schedulingChangeComingToOnGoingEvent() {
+    LocalDate now = LocalDate.now();
+    AtomicLong changedEventCount = new AtomicLong();
+    eventRepository
+        .findAllByStatus(Status.COMING)
+        .forEach(
+            event -> {
+              if (!now.isAfter(event.getEndDate()) && !now.isBefore(event.getStartDate())) {
+                event.updateStatus(Status.ONGOING);
+                changedEventCount.getAndIncrement();
+              }
+            });
+    log.info("총 {}개의 COMING 이벤트가 ONGOING 이벤트로 변경되었습니다.", changedEventCount.get());
+  }
+
+  @Override
+  @Transactional
   public List<MbtiEventResponse> getRecommend(String mbti) {
     Map<EventClassification, Integer> weightScore = new HashMap<>();
     for (EventClassification eventClassification : EventClassification.values()) {
@@ -295,10 +313,23 @@ public class EventServiceImpl implements EventService {
     };
   }
 
+  @Override
+  public void initStatus() {
+    LocalDate now = LocalDate.now();
+    eventRepository
+        .findAllByStatus(Status.ONGOING)
+        .forEach(
+            event -> {
+              if (event.getStartDate().isAfter(now)) event.setStatus(Status.COMING);
+            });
+    log.info("초기화 수행 완료");
+  }
+
   private Event toCreateEvent(CreateEventRequest createEventRequest, EventCategory eventCategory) {
     return Event.builder()
         .title(createEventRequest.getTitle())
         .location(createEventRequest.getLocation())
+        .status(Status.ONGOING)
         .startDate(createEventRequest.getStartDate())
         .endDate(createEventRequest.getEndDate())
         .eventTime(createEventRequest.getEventTime())
