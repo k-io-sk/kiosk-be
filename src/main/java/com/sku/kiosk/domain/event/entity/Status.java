@@ -5,5 +5,6 @@ package com.sku.kiosk.domain.event.entity;
 
 public enum Status {
   ONGOING,
-  ENDED
+  ENDED,
+  COMING
 }
