@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -130,6 +131,11 @@ public class EventControllerImpl implements EventController {
         .body(
             BaseResponse.success(
                 200, "메인 화면 카테고리별 랜덤 5개 이벤트 응답 성공", eventService.getRandomByCategory()));
+  }
+
+  @GetMapping("/init-status")
+  public void initOnGoingEvent() {
+    eventService.initStatus();
   }
 
   private Pageable validatePageable(Integer pageNum, Integer pageSize) {
