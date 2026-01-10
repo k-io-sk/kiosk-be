@@ -34,6 +34,7 @@ import com.sksamuel.scrimage.ImmutableImage;
 import com.sksamuel.scrimage.webp.WebpWriter;
 import com.sku.kiosk.domain.crawling.props.JongnoCrawlingProperties;
 import com.sku.kiosk.domain.event.entity.Event;
+import com.sku.kiosk.domain.event.entity.Status;
 import com.sku.kiosk.domain.event.repository.EventRepository;
 import com.sku.kiosk.domain.event.service.EventService;
 import com.sku.kiosk.global.s3.entity.PathName;
@@ -122,6 +123,7 @@ public class CrawlingServiceImpl implements CrawlingService {
   private List<Event> crawlingEvents() {
     try {
       YearMonth currentMonth = YearMonth.now();
+      LocalDate currentDate = LocalDate.now();
 
       String url =
           props.getRequestUrl()
@@ -159,6 +161,16 @@ public class CrawlingServiceImpl implements CrawlingService {
       for (Element row : rows) {
         if (!getText(row, "GUNAME").equals("종로구")) continue;
 
+        LocalDate startDate = toLocalDate(getText(row, "STRTDATE"));
+        LocalDate endDate = toLocalDate(getText(row, "END_DATE"));
+        Status status;
+
+        if (startDate == null || endDate == null) continue;
+        if (endDate.isBefore(currentDate)) continue;
+        if (startDate.isAfter(currentDate)) status = Status.COMING;
+        else if (!currentDate.isAfter(endDate)) status = Status.ONGOING;
+        else continue;
+
         Event event =
             Event.builder()
                 .cultCode(extractCultcode(getText(row, "HMPG_ADDR")))
@@ -173,8 +185,9 @@ public class CrawlingServiceImpl implements CrawlingService {
                 .description(extractDescription(getText(row, "PROGRAM")))
                 .orgLink(getText(row, "ORG_LINK"))
                 .originImageUrl(getText(row, "MAIN_IMG"))
-                .startDate(toLocalDate(getText(row, "STRTDATE")))
-                .endDate(toLocalDate(getText(row, "END_DATE")))
+                .status(status)
+                .startDate(startDate)
+                .endDate(endDate)
                 .latitude(parseDouble(getText(row, "LAT")))
                 .longitude(parseDouble(getText(row, "LOT")))
                 .isFree(getText(row, "IS_FREE").equals("무료"))
